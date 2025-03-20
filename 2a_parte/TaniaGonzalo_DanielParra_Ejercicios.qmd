@@ -1,0 +1,37 @@
+---
+title: "Ejercicios2_algoritmos"
+author: "Tania Gonzalo Daniel Parra"
+format: pdf
+editor: visual
+---
+
+## WORKSHEET
+
+### Ejercicio 1 (4 puntos)
+
+En este ejercicio probarás el algoritmo Needleman-Wunsch en una secuencia corta de partes de hemoglobina (código PDB 1AOW) y mioglobina 1 (código PDB 1AZI). Aquí alineará la secuencia HGSAQVKGHG con la secuencia KTEAEMKASEDLKKHGT.
+
+Las dos secuencias están dispuestas en una matriz en la Tabla 1. Las secuencias comienzan en la esquina superior derecha, y las penalizaciones por desfase inicial se enumeran en cada posición inicial de desfase. La penalización por desfase se considera -8. Las puntuaciones de similitud Si,j procedentes de la búsqueda de coincidencias proceden de la tabla BLOSUM40.
+
+![Matriz y alineamientos obtenidos](Solucion_Ej1_Dani.jpeg)
+
+Como se puede observar, La puntuación obtenida es -21 y se han encontrado dos alineamientos globales posibles.
+
+### Ejercicio 2 (6 puntos)
+
+Dado el conjunto de secuencias múltiples:
+
+ - S1: PPGVKSDCAS 
+ 
+ - S2: PADGVKDCAS 
+
+ - S3: PPDGKSDS 
+
+ - S4: GADGKDCCS 
+
+ - S5: GADGKDCAS 
+ 
+Utilice el popular método de alineación progresiva para alinear globalmente el conjunto anterior de secuencias. Genere el árbol guía por unión de vecinos. Compare su resultado (alineamiento) con el de Clustal-Omega. 
+
+Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
+
