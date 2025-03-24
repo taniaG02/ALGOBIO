@@ -35,3 +35,46 @@ Utilice el popular método de alineación progresiva para alinear globalmente el
 
 Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
 
+Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignment (PSA) para realizar los distintos alineamientos dos a dos; y Clustal Omega, Multiple Sequence Alignment (MSA) para el alineamiento múltiple.
+
+#### Alineamientos dos a dos
+
+Los parámetros que utilizamos para realizar este proceso son:
+
+![Parámetros para el alineamiento dos a dos](Ej2/Parametros_pairwise.png)
+
+Obtivimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
+
+<!-- Añadir múltiples capturas poniendo en el pie de cada una el score de similitud -->
+
+Y construímos la matriz de distancias:
+
+<!-- Añadir foto matriz -->
+
+Finalmente, construímos el guide tree:
+
+<!-- Añadir foto guide tree -->
+
+Y el alineamiento ¿forward?: ¿Lo hacemos también?
+
+#### Alineamiento múltiple
+
+Los parámetros utilizados para realizar este proceso fueron:
+
+![Parámetros para el alineamiento múltiple](Ej2/Parametros_clustal.png)
+
+Obtivos el siguiente guide tree:
+
+![Guide tree del alineamiento múltiple por Clustal Omega](Ej2/GuideTree_clustalOmega_MSA.png)
+
+Y este alineamiento múltiple:
+
+<!-- Añadir foto alineamiento -->
+
+#### Comparación y logo
+
+Observamos que los guide tree obtenidos por ambos procesos son mmmmmmmmmm
+
+El logo que se obtiene utilizando el alineamiento múltiple obtenido mediante Clustal Omega es:
+
+![Logo del MSA](Ej2/Logo_clustal.png)
