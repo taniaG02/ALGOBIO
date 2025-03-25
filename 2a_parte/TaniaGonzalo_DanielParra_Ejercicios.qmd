@@ -35,7 +35,7 @@ Utilice el popular método de alineación progresiva para alinear globalmente el
 
 Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
 
-Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignment (PSA) para realizar los distintos alineamientos dos a dos; y Clustal Omega, Multiple Sequence Alignment (MSA) para el alineamiento múltiple.
+Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignment (PSA) para realizar los distintos alineamientos dos a dos; y Clustal Omega (1.2.4), Multiple Sequence Alignment (MSA) para el alineamiento múltiple.
 
 #### Alineamientos dos a dos
 
@@ -45,9 +45,29 @@ Los parámetros que utilizamos para realizar este proceso son:
 
 Obtivimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
 
+![Alineamiento dos a dos de S1 vs S2, con 10 aa cada secuencia y 8 coincidencias, tiene un score 8/10](Ej2/Alineamiento_2a2_S1-S2.png)
+
+![Alineamiento dos a dos de S1 vs S3, con 10 aa en S1 y 8 aa en S3; y 5 coincidencias, tiene un score 5/9](Ej2/Alineamiento_2a2_S1-S3.png)
+
+![Alineamiento dos a dos de S1 vs S4, con 10 aa en S1 y 9 aa en S4; y 4 coincidencias, tiene un score 8/19](Ej2/Alineamiento_2a2_S1-S4.png)
+
+![Alineamiento dos a dos de S1 vs S5, con 10 aa en S1 y 9 aa en S5; y 5 coincidencias, tiene un score 10/19](Ej2/Alineamiento_2a2_S1-S5.png)
+
+![Alineamiento dos a dos de S2 vs S3, con 10 aa en S2 y 8 aa en S3; y 4 coincidencias, tiene un score 4/9](Ej2/Alineamiento_2a2_S2-S3.png)
+
+![Alineamiento dos a dos de S2 vs S4, con 10 aa en S2 y 9 aa en S4; y 7 coincidencias, tiene un score 14/19](Ej2/Alineamiento_2a2_S2-S4.png)
+
+![Alineamiento dos a dos de S2 vs S5, con 10 aa en S2 y 9 aa en S5; y 8 coincidencias, tiene un score 16/19](Ej2/Alineamiento_2a2_S2-S5.png)
+
+![Alineamiento dos a dos de S3 vs S4, con 8 aa en S3 y 9 aa en S4; y 4 coincidencias, tiene un score 8/17](Ej2/Alineamiento_2a2_S3-S4.png)
+
+![Alineamiento dos a dos de S3 vs S5, con 8 aa en S3 y 9 aa en S5; y 3 coincidencias, tiene un score 6/17](Ej2/Alineamiento_2a2_S3-S5.png)
+
+![Alineamiento dos a dos de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9](Ej2/Alineamiento_2a2_S4-S5.png)
+
 <!-- Añadir múltiples capturas poniendo en el pie de cada una el score de similitud -->
 
-Y construímos la matriz de distancias:
+Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
 
 <!-- Añadir foto matriz -->
 
@@ -69,12 +89,14 @@ Obtivos el siguiente guide tree:
 
 Y este alineamiento múltiple:
 
-<!-- Añadir foto alineamiento -->
+![Alineamiento múltiple por Clustal Omega](Ej2/Alineamiento_clustalOmega_MSA_bonito.png)
 
 #### Comparación y logo
 
 Observamos que los guide tree obtenidos por ambos procesos son mmmmmmmmmm
 
-El logo que se obtiene utilizando el alineamiento múltiple obtenido mediante Clustal Omega es:
+El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Omega es:
 
 ![Logo del MSA](Ej2/Logo_clustal.png)
+
+Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley.edu/logo.cgi
