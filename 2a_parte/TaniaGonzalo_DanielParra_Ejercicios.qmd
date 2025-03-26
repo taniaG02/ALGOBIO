@@ -3,6 +3,7 @@ title: "Ejercicios2_algoritmos"
 author: "Tania Gonzalo Daniel Parra"
 format: pdf
 editor: visual
+lang: es 
 ---
 
 ## WORKSHEET
@@ -13,7 +14,7 @@ En este ejercicio probarás el algoritmo Needleman-Wunsch en una secuencia corta
 
 Las dos secuencias están dispuestas en una matriz en la Tabla 1. Las secuencias comienzan en la esquina superior derecha, y las penalizaciones por desfase inicial se enumeran en cada posición inicial de desfase. La penalización por desfase se considera -8. Las puntuaciones de similitud Si,j procedentes de la búsqueda de coincidencias proceden de la tabla BLOSUM40.
 
-![Matriz y alineamientos obtenidos](Solucion_Ej1_Dani.jpeg)
+![Matriz y alineamientos obtenidos.](Solucion_Ej1_Dani.jpeg)
 
 Como se puede observar, La puntuación obtenida es -21 y se han encontrado dos alineamientos globales posibles.
 
@@ -41,33 +42,75 @@ Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignmen
 
 Los parámetros que utilizamos para realizar este proceso son:
 
-![Parámetros para el alineamiento dos a dos](Ej2/Parametros_pairwise.png)
+![Parámetros para el alineamiento dos a dos.](Ej2/Parametros_pairwise.png)
+
+Decidimos intentar mantener unos parámetros próximos a losutilizados en el ejercicio 1: una tabla BLOSUM40 y restar 10 por cada gap (lo más próximo a 8 que estaba disponible).
 
 Obtivimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
 
-![Alineamiento dos a dos de S1 vs S2, con 10 aa cada secuencia y 8 coincidencias, tiene un score 8/10](Ej2/Alineamiento_2a2_S1-S2.png)
+![Alineamiento dos a dos de S1 vs S2, con 10 aa cada secuencia y 8 coincidencias, tiene un score 8/10.](Ej2/Alineamiento_2a2_S1-S2.png)
 
-![Alineamiento dos a dos de S1 vs S3, con 10 aa en S1 y 8 aa en S3; y 5 coincidencias, tiene un score 5/9](Ej2/Alineamiento_2a2_S1-S3.png)
+![Alineamiento dos a dos de S1 vs S3, con 10 aa en S1 y 8 aa en S3; y 5 coincidencias, tiene un score 5/9.](Ej2/Alineamiento_2a2_S1-S3.png)
 
-![Alineamiento dos a dos de S1 vs S4, con 10 aa en S1 y 9 aa en S4; y 4 coincidencias, tiene un score 8/19](Ej2/Alineamiento_2a2_S1-S4.png)
+![Alineamiento dos a dos de S1 vs S4, con 10 aa en S1 y 9 aa en S4; y 4 coincidencias, tiene un score 8/19.](Ej2/Alineamiento_2a2_S1-S4.png)
 
-![Alineamiento dos a dos de S1 vs S5, con 10 aa en S1 y 9 aa en S5; y 5 coincidencias, tiene un score 10/19](Ej2/Alineamiento_2a2_S1-S5.png)
+![Alineamiento dos a dos de S1 vs S5, con 10 aa en S1 y 9 aa en S5; y 5 coincidencias, tiene un score 10/19.](Ej2/Alineamiento_2a2_S1-S5.png)
 
-![Alineamiento dos a dos de S2 vs S3, con 10 aa en S2 y 8 aa en S3; y 4 coincidencias, tiene un score 4/9](Ej2/Alineamiento_2a2_S2-S3.png)
+![Alineamiento dos a dos de S2 vs S3, con 10 aa en S2 y 8 aa en S3; y 4 coincidencias, tiene un score 4/9.](Ej2/Alineamiento_2a2_S2-S3.png)
 
-![Alineamiento dos a dos de S2 vs S4, con 10 aa en S2 y 9 aa en S4; y 7 coincidencias, tiene un score 14/19](Ej2/Alineamiento_2a2_S2-S4.png)
+![Alineamiento dos a dos de S2 vs S4, con 10 aa en S2 y 9 aa en S4; y 7 coincidencias, tiene un score 14/19.](Ej2/Alineamiento_2a2_S2-S4.png)
 
-![Alineamiento dos a dos de S2 vs S5, con 10 aa en S2 y 9 aa en S5; y 8 coincidencias, tiene un score 16/19](Ej2/Alineamiento_2a2_S2-S5.png)
+![Alineamiento dos a dos de S2 vs S5, con 10 aa en S2 y 9 aa en S5; y 8 coincidencias, tiene un score 16/19.](Ej2/Alineamiento_2a2_S2-S5.png)
 
-![Alineamiento dos a dos de S3 vs S4, con 8 aa en S3 y 9 aa en S4; y 4 coincidencias, tiene un score 8/17](Ej2/Alineamiento_2a2_S3-S4.png)
+![Alineamiento dos a dos de S3 vs S4, con 8 aa en S3 y 9 aa en S4; y 4 coincidencias, tiene un score 8/17.](Ej2/Alineamiento_2a2_S3-S4.png)
 
-![Alineamiento dos a dos de S3 vs S5, con 8 aa en S3 y 9 aa en S5; y 3 coincidencias, tiene un score 6/17](Ej2/Alineamiento_2a2_S3-S5.png)
+![Alineamiento dos a dos de S3 vs S5, con 8 aa en S3 y 9 aa en S5; y 3 coincidencias, tiene un score 6/17.](Ej2/Alineamiento_2a2_S3-S5.png)
 
-![Alineamiento dos a dos de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9](Ej2/Alineamiento_2a2_S4-S5.png)
+![Alineamiento dos a dos de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9.](Ej2/Alineamiento_2a2_S4-S5.png)
 
 <!-- Añadir múltiples capturas poniendo en el pie de cada una el score de similitud -->
 
 Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
+
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg)
+
+Finalmente, construímos el guide tree:
+
+![Guide Tree obtenido  partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg)
+
+Y el alineamiento ¿forward?: ¿Lo hacemos también?
+
+
+
+##### Con parámetros por defecto
+
+También, debido a que Clustal Omega utiliza una tabla BLOSUM62, decidimos repetir este proceso pero dejando los parámetros que vienen por defecto:
+
+![Parámetros para el alineamiento dos a dos por defecto.](Ej2/Parametros_pairwise_por_defecto.png)
+
+Los alineamientos y scores obtenidos con estos parámetros fueron:
+
+![Alineamiento dos a dos con parámetros por defecto, de S1 vs S2, con 10 aa cada secuencia y 7 coincidencias, tiene un score 7/10.](Ej2/Alineamiento_2a2_S1-S2_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S1 vs S3, con 10 aa en S1 y 8 aa en S3; y 5 coincidencias, tiene un score 5/9.](Ej2/Alineamiento_2a2_S1-S3_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S1 vs S4, con 10 aa en S1 y 9 aa en S4; y 4 coincidencias, tiene un score 8/19.](Ej2/Alineamiento_2a2_S1-S4_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S1 vs S5, con 10 aa en S1 y 9 aa en S5; y 5 coincidencias, tiene un score 10/19.](Ej2/Alineamiento_2a2_S1-S5_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S2 vs S3, con 10 aa en S2 y 8 aa en S3; y 4 coincidencias, tiene un score 4/9.](Ej2/Alineamiento_2a2_S2-S3_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S2 vs S4, con 10 aa en S2 y 9 aa en S4; y 7 coincidencias, tiene un score 14/19.](Ej2/Alineamiento_2a2_S2-S4_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S2 vs S5, con 10 aa en S2 y 9 aa en S5; y 8 coincidencias, tiene un score 16/19.](Ej2/Alineamiento_2a2_S2-S5_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S3 vs S4, con 8 aa en S3 y 9 aa en S4; y 3 coincidencias, tiene un score 6/17.](Ej2/Alineamiento_2a2_S3-S4_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S3 vs S5, con 8 aa en S3 y 9 aa en S5; y 3 coincidencias, tiene un score 6/17.](Ej2/Alineamiento_2a2_S3-S5_def.png)
+
+![Alineamiento dos a dos con parámetros por defecto, de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9.](Ej2/Alineamiento_2a2_S4-S5_def.png)
+
+La matriz de distancias correspondiente a estos alineamientos sería:
 
 <!-- Añadir foto matriz -->
 
@@ -77,19 +120,22 @@ Finalmente, construímos el guide tree:
 
 Y el alineamiento ¿forward?: ¿Lo hacemos también?
 
+
+
+
 #### Alineamiento múltiple
 
 Los parámetros utilizados para realizar este proceso fueron:
 
-![Parámetros para el alineamiento múltiple](Ej2/Parametros_clustal.png)
+![Parámetros para el alineamiento múltiple.](Ej2/Parametros_clustal.png)
 
 Obtivos el siguiente guide tree:
 
-![Guide tree del alineamiento múltiple por Clustal Omega](Ej2/GuideTree_clustalOmega_MSA.png)
+![Guide tree del alineamiento múltiple por Clustal Omega.](Ej2/GuideTree_clustalOmega_MSA.png)
 
 Y este alineamiento múltiple:
 
-![Alineamiento múltiple por Clustal Omega](Ej2/Alineamiento_clustalOmega_MSA_bonito.png)
+![Alineamiento múltiple por Clustal Omega.](Ej2/Alineamiento_clustalOmega_MSA_bonito.png)
 
 #### Comparación y logo
 
@@ -97,6 +143,6 @@ Observamos que los guide tree obtenidos por ambos procesos son mmmmmmmmmm
 
 El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Omega es:
 
-![Logo del MSA](Ej2/Logo_clustal.png)
+![Logo del MSA.](Ej2/Logo_clustal.png)
 
 Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley.edu/logo.cgi
