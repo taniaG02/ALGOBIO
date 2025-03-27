@@ -76,9 +76,11 @@ Y construímos la matriz de distancias, para la cual hacemos 1 - el score de sim
 
 Finalmente, construímos el guide tree:
 
-![Guide Tree obtenido  partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg)
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width=50%}
 
-Y el alineamiento ¿forward?: ¿Lo hacemos también?
+Y el alineamiento progresivo: 
+
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg)
 
 
 
@@ -112,11 +114,11 @@ Los alineamientos y scores obtenidos con estos parámetros fueron:
 
 La matriz de distancias correspondiente a estos alineamientos sería:
 
-<!-- Añadir foto matriz -->
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg)
 
 Finalmente, construímos el guide tree:
 
-<!-- Añadir foto guide tree -->
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros por defecto.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width=50%}
 
 Y el alineamiento ¿forward?: ¿Lo hacemos también?
 
