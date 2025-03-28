@@ -44,7 +44,7 @@ Los parámetros que utilizamos para realizar este proceso son:
 
 ![Parámetros para el alineamiento dos a dos.](Ej2/Parametros_pairwise.png)
 
-Decidimos intentar mantener unos parámetros próximos a losutilizados en el ejercicio 1: una tabla BLOSUM40 y restar 10 por cada gap (lo más próximo a 8 que estaba disponible).
+Decidimos intentar mantener unos parámetros próximos a los utilizados en el ejercicio 1: una tabla BLOSUM40 y restar 10 por cada gap (lo más próximo a 8 que estaba disponible).
 
 Obtivimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
 
@@ -72,7 +72,7 @@ Obtivimos los siguientes alineamientos son sus scores correspondientes, calculad
 
 Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg)
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){width=80%}
 
 Finalmente, construímos el guide tree:
 
@@ -114,7 +114,7 @@ Los alineamientos y scores obtenidos con estos parámetros fueron:
 
 La matriz de distancias correspondiente a estos alineamientos sería:
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg)
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){width=80%}
 
 Finalmente, construímos el guide tree:
 
@@ -141,9 +141,13 @@ Y este alineamiento múltiple:
 
 #### Comparación y logo
 
-Observamos que los guide tree obtenidos por ambos procesos son mmmmmmmmmm
+Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. procesos son mmmmmmmmmm
 
 El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Omega es:
+
+**Está mal, hay que intentar hacerlo en otro sitio (ejemplo paquete de R)**
+
+**Explicar un poco el proceso por el que se han obtenido los distintos logos**
 
 ![Logo del MSA.](Ej2/Logo_clustal.png)
 
