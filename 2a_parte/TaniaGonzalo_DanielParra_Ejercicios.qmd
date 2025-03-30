@@ -22,17 +22,17 @@ Como se puede observar, La puntuación obtenida es -21 y se han encontrado dos a
 
 Dado el conjunto de secuencias múltiples:
 
- - S1: PPGVKSDCAS 
- 
- - S2: PADGVKDCAS 
+-   S1: PPGVKSDCAS
 
- - S3: PPDGKSDS 
+-   S2: PADGVKDCAS
 
- - S4: GADGKDCCS 
+-   S3: PPDGKSDS
 
- - S5: GADGKDCAS 
- 
-Utilice el popular método de alineación progresiva para alinear globalmente el conjunto anterior de secuencias. Genere el árbol guía por unión de vecinos. Compare su resultado (alineamiento) con el de Clustal-Omega. 
+-   S4: GADGKDCCS
+
+-   S5: GADGKDCAS
+
+Utilice el popular método de alineación progresiva para alinear globalmente el conjunto anterior de secuencias. Genere el árbol guía por unión de vecinos. Compare su resultado (alineamiento) con el de Clustal-Omega.
 
 Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
 
@@ -72,17 +72,15 @@ Obtuvimos los siguientes alineamientos son sus scores correspondientes, calculad
 
 Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){width=80%}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){width="80%"}
 
 Finalmente, construímos el guide tree:
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width=50%}
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width="50%"}
 
-Y el alineamiento progresivo: 
+Y el alineamiento progresivo:
 
 ![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg)
-
-
 
 ##### Con parámetros por defecto
 
@@ -114,16 +112,18 @@ Los alineamientos y scores obtenidos con estos parámetros fueron:
 
 La matriz de distancias correspondiente a estos alineamientos sería:
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){width=80%}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){width="80%"}
 
 Finalmente, construímos el guide tree:
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros por defecto.](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width=50%}
+![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width="50%"}
 
- (QUITAR!!!)Y el alineamiento ¿forward?: ¿Lo hacemos también?
+Y el alineamiento progresivo:
+
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOUSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
 
 
-
+(QUITAR!!!)Y el alineamiento ¿forward?: ¿Lo hacemos también?
 
 #### Alineamiento múltiple
 
@@ -152,7 +152,6 @@ El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Ome
 ![Logo del MSA.](Ej2/Logo_clustal.png)
 
 Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley.edu/logo.cgi
-
 
 ## Hacer logo en R:
 
@@ -196,9 +195,6 @@ ggseqlogo(matriz_frec,
 #ggsave("logo_secuenciaClustalW.png", width = 10, height = 5, dpi = 300)
 ```
 
-
-
-
 ```{r}
 # --- 1. Cargar el alineamiento (formato FASTA) ---
 alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM40.fa")  
@@ -225,4 +221,3 @@ ggseqlogo(matriz_frec,
 # --- 4. Guardar el logo (opcional) ---
 #ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
 ```
-
