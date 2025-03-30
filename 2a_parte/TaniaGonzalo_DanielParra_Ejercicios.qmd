@@ -46,7 +46,7 @@ Los parámetros que utilizamos para realizar este proceso son:
 
 Decidimos intentar mantener unos parámetros próximos a los utilizados en el ejercicio 1: una tabla BLOSUM40 y restar 10 por cada gap (lo más próximo a 8 que estaba disponible).
 
-Obtivimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
+Obtuvimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
 
 ![Alineamiento dos a dos de S1 vs S2, con 10 aa cada secuencia y 8 coincidencias, tiene un score 8/10.](Ej2/Alineamiento_2a2_S1-S2.png)
 
@@ -118,9 +118,9 @@ La matriz de distancias correspondiente a estos alineamientos sería:
 
 Finalmente, construímos el guide tree:
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros por defecto.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width=50%}
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros por defecto.](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width=50%}
 
-Y el alineamiento ¿forward?: ¿Lo hacemos también?
+ (QUITAR!!!)Y el alineamiento ¿forward?: ¿Lo hacemos también?
 
 
 
@@ -152,3 +152,77 @@ El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Ome
 ![Logo del MSA.](Ej2/Logo_clustal.png)
 
 Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley.edu/logo.cgi
+
+
+## Hacer logo en R:
+
+```{r}
+# Instalar paquetes si no los tienes (solo una vez)
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+#BiocManager::install("Biostrings")
+#install.packages("ggseqlogo")
+
+# Cargar librerías
+library(Biostrings)  # Para manejar secuencias
+library(ggseqlogo)   # Para crear el logo
+library(ggplot2)     # Para personalización gráfica
+
+# --- 1. Cargar el alineamiento (formato FASTA) ---
+alineamiento <- readAAStringSet("clustalo-I20250321-165928-0743-92365021-p1m.fa")  # Para proteínas
+# Si es ADN, usa: readDNAStringSet()
+
+# --- 2. Convertir a matriz de frecuencias ---
+# Alternativa: calcular manualmente la matriz
+matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
+ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+
+# --- 3. Crear el logo ---
+ggseqlogo(matriz_frec, 
+          method = "bits",         # Escala en bits (alternativa: "probability")
+          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
+          col_scheme = "chemistry",# Esquema de colores para proteínas
+          font = "helvetica_bold"  # Fuente
+) + 
+  labs(
+    title = "Logo de secuencia generado desde ClustalW",
+    x = "Posición en el alineamiento",
+    y = "Bits de información"
+  ) +
+  theme_classic() +               # Estilo del gráfico
+  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+
+# --- 4. Guardar el logo (opcional) ---
+#ggsave("logo_secuenciaClustalW.png", width = 10, height = 5, dpi = 300)
+```
+
+
+
+
+```{r}
+# --- 1. Cargar el alineamiento (formato FASTA) ---
+alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM40.fa")  
+
+# --- 2. Convertir a matriz de frecuencias ---
+matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
+ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+
+# --- 3. Crear el logo ---
+ggseqlogo(matriz_frec, 
+          method = "bits",         # Escala en bits (alternativa: "probability")
+          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
+          col_scheme = "chemistry",# Esquema de colores para proteínas
+          font = "helvetica_bold"  # Fuente
+) + 
+  labs(
+    title = "Logo de secuencia generado desde ClustalW",
+    x = "Posición en el alineamiento",
+    y = "Bits de información"
+  ) +
+  theme_classic() +               # Estilo del gráfico
+  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+
+# --- 4. Guardar el logo (opcional) ---
+#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
+```
+
