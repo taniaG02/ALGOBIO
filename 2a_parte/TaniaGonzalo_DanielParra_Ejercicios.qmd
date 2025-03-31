@@ -144,112 +144,140 @@ Y este alineamiento múltiple:
 
 #### Comparación y logo
 
-Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. procesos son **mmmmmmmmmm**
+Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. Los alineamientos progresivos obtenidos en los alineamientos 2 a 2 con la BLOUSUM40 y BLOUSUM62, son muy semejantes, variando únicamente por a posición de la segunda prolina (P) de la S1, debido a la utilización de distintas matrices de sustitución y los diferentes valores utilizados para penalizar los gaps.
+
+Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad, en el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
 
 Cargamos las librerías necesarias, caragamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
 
-```{r} 
-#| warning: false
-# Instalar paquetes si no los tienes (solo una vez)
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-    #install.packages("BiocManager")
-#BiocManager::install("Biostrings")
-#install.packages("ggseqlogo")
 
-# Cargar librerías
-library(Biostrings)  # Para manejar secuencias
-library(ggseqlogo)   # Para crear el logo
-library(ggplot2)     # Para personalización gráfica
+##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+
+```{python}
+from Bio import AlignIO
+import logomaker
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Cargar y procesar el alineamiento
+alignment = AlignIO.read("Alineamiento_final_BLOUSUM40.fa", "fasta")
+sequences = [str(record.seq) for record in alignment]
+
+# Crear matriz de conteos (sin gaps)
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
+
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
+
+# Calcular información (en bits) para cada posición
+information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
+
+# Crear el logo
+logo = logomaker.Logo(
+    information_matrix,  # Usamos la matriz de información directamente
+    color_scheme='chemistry',
+    font_name='Arial',
+    show_spines=True,
+    stack_order='big_on_top'
+)
+
+# Limitar bits a 4.32 si es necesario
+logo.ax.set_ylim(0, 4.32)
+
+# Personalización adicional
+logo.ax.set_title("Logo de alineamiento progresivo con la Blosum40")
+logo.ax.set_xlabel("Posición")
+logo.ax.set_ylabel("Bits")
+logo.ax.set_ylim(0, 3)
+
+plt.tight_layout()
+plt.show()
 ```
 
 ##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
 
-```{r}
-# 1. Cargar el alineamiento (formato FASTA) 
-alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM40.fa")  
+```{python}
+from Bio import AlignIO
+import logomaker
+import matplotlib.pyplot as plt
+import numpy as np
 
-# 2. Convertir a matriz de frecuencias
-matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
-ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+# Cargar y procesar el alineamiento
+alignment = AlignIO.read("Alineamiento_final_BLOUSUM62.fa", "fasta")
+sequences = [str(record.seq) for record in alignment]
 
-# 3. Crear el logo
-ggseqlogo(matriz_frec, 
-          method = "bits",         # Escala en bits (alternativa: "probability")
-          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
-          col_scheme = "chemistry",# Esquema de colores para proteínas
-          font = "helvetica_bold"  # Fuente
-) + 
-  labs(
-    title = "Logo del alineamiento progresivo con la Blosum40",
-    x = "Posición en el alineamiento",
-    y = "Bits de información"
-  ) +
-  theme_classic() +               # Estilo del gráfico
-  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+# Crear matriz de conteos (sin gaps)
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
 
-# 4. Guardar el logo (opcional)
-#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
-```
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
 
-##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+# Calcular información (en bits) para cada posición
+information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
 
-```{r}
-# 1. Cargar el alineamiento (formato FASTA) 
-alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM62.fa")  
+# Crear el logo
+logo = logomaker.Logo(
+    information_matrix,  # Usamos la matriz de información directamente
+    color_scheme='chemistry',
+    font_name='Arial',
+    show_spines=True,
+    stack_order='big_on_top'
+)
 
-# 2. Convertir a matriz de frecuencias
-matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
-ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+# Limitar bits a 4.32 si es necesario
+logo.ax.set_ylim(0, 4.32)
 
-# 3. Crear el logo
-ggseqlogo(matriz_frec, 
-          method = "bits",         # Escala en bits (alternativa: "probability")
-          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
-          col_scheme = "chemistry",# Esquema de colores para proteínas
-          font = "helvetica_bold"  # Fuente
-) + 
-  labs(
-    title = "Logo del alineamiento progresivo con la Blosum62",
-    x = "Posición en el alineamiento",
-    y = "Bits de información"
-  ) +
-  theme_classic() +               # Estilo del gráfico
-  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+# Personalización adicional
+logo.ax.set_title("Logo de alineamiento progresivo con la Blosum62")
+logo.ax.set_xlabel("Posición")
+logo.ax.set_ylabel("Bits")
+logo.ax.set_ylim(0, 3)
 
-# 4. Guardar el logo (opcional)
-#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
+plt.tight_layout()
+plt.show()
 ```
 
 ##### Logo del MSA por Clustal Omega
 
-```{r} 
-# 1. Cargar el alineamiento (formato FASTA)
-alineamiento <- readAAStringSet("clustalo-I20250321-165928-0743-92365021-p1m.fa")  # Para proteínas
-# Si es ADN, usa: readDNAStringSet()
+```{python}
+from Bio import AlignIO
+import logomaker
+import matplotlib.pyplot as plt
+import numpy as np
 
-# 2. Convertir a matriz de frecuencias
-# Alternativa: calcular manualmente la matriz
-matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
-ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+# Cargar y procesar el alineamiento
+alignment = AlignIO.read("clustalo-I20250321-165928-0743-92365021-p1m.fa", "fasta")
+sequences = [str(record.seq) for record in alignment]
 
-# 3. Crear el logo
-ggseqlogo(matriz_frec, 
-          method = "bits",         # Escala en bits (alternativa: "probability")
-          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
-          col_scheme = "chemistry",# Esquema de colores para proteínas
-          font = "helvetica_bold"  # Fuente
-) + 
-  labs(
-    title = "Logo de secuencia generado desde ClustalW",
-    x = "Posición en el alineamiento",
-    y = "Bits de información"
-  ) +
-  theme_classic() +               # Estilo del gráfico
-  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+# Crear matriz de conteos (sin gaps)
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
 
-# --- 4. Guardar el logo (opcional) ---
-#ggsave("logo_secuenciaClustalW.png", width = 10, height = 5, dpi = 300)
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
+
+# Calcular información (en bits) para cada posición
+information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
+
+# Crear el logo
+logo = logomaker.Logo(
+    information_matrix,  # Usamos la matriz de información directamente
+    color_scheme='chemistry',
+    font_name='Arial',
+    show_spines=True,
+    stack_order='big_on_top'
+)
+
+# Limitar bits a 4.32 si es necesario
+logo.ax.set_ylim(0, 4.32)
+
+# Personalización adicional
+logo.ax.set_title("Logo de alineamiento ClustalW")
+logo.ax.set_xlabel("Posición")
+logo.ax.set_ylabel("Bits")
+logo.ax.set_ylim(0, 3)
+
+plt.tight_layout()
+plt.show()
 ```
 
-#### Escogemos un logo/alineamiento:
-
+De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSOUM62.
