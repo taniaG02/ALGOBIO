@@ -1,8 +1,7 @@
- ---
+---
 title: "Ejercicios2_algoritmos"
 author: "Tania Gonzalo y Daniel Parra"
 format: pdf
-editor: visual
 lang: es 
 ---
 
@@ -164,13 +163,15 @@ alignment = AlignIO.read("Alineamiento_final_BLOUSUM40.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts',\
+   characters_to_ignore='-')
 
 # Convertir a frecuencias relativas (ignorando gaps)
 frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
 
 # Calcular información (en bits) para cada posición
-information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
+  from_type='probability', to_type='information')
 
 # Crear el logo
 logo = logomaker.Logo(
@@ -207,13 +208,15 @@ alignment = AlignIO.read("Alineamiento_final_BLOUSUM62.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts',\
+   characters_to_ignore='-')
 
 # Convertir a frecuencias relativas (ignorando gaps)
 frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
 
 # Calcular información (en bits) para cada posición
-information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
+  from_type='probability', to_type='information')
 
 # Crear el logo
 logo = logomaker.Logo(
@@ -246,17 +249,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Cargar y procesar el alineamiento
-alignment = AlignIO.read("clustalo-I20250321-165928-0743-92365021-p1m.fa", "fasta")
+alignment = AlignIO.read("clustalo-I20250321-165928-0743-92365021-p1m.fa", \
+  "fasta")
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', \
+  characters_to_ignore='-')
 
 # Convertir a frecuencias relativas (ignorando gaps)
 frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
 
 # Calcular información (en bits) para cada posición
-information_matrix = logomaker.transform_matrix(frequency_matrix, from_type='probability', to_type='information')
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
+  from_type='probability', to_type='information')
 
 # Crear el logo
 logo = logomaker.Logo(
