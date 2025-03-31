@@ -1,6 +1,6 @@
----
+ ---
 title: "Ejercicios2_algoritmos"
-author: "Tania Gonzalo Daniel Parra"
+author: "Tania Gonzalo y Daniel Parra"
 format: pdf
 editor: visual
 lang: es 
@@ -36,7 +36,13 @@ Utilice el popular método de alineación progresiva para alinear globalmente el
 
 Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
 
+#### Métodos
+
 Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignment (PSA) para realizar los distintos alineamientos dos a dos; y Clustal Omega (1.2.4), Multiple Sequence Alignment (MSA) para el alineamiento múltiple.
+
+Los alineamientos progresivos y guide trees correspondientes a los alineamientos dos a dos, los realizamos a mano.
+
+Finalmente, obtuvimos los logos en R, utilizando los paquetes Biostrings, ggseqlogo y ggplot2.
 
 #### Alineamientos dos a dos
 
@@ -68,7 +74,6 @@ Obtuvimos los siguientes alineamientos son sus scores correspondientes, calculad
 
 ![Alineamiento dos a dos de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9.](Ej2/Alineamiento_2a2_S4-S5.png)
 
-<!-- Añadir múltiples capturas poniendo en el pie de cada una el score de similitud -->
 
 Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
 
@@ -123,8 +128,6 @@ Y el alineamiento progresivo:
 ![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOUSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
 
 
-(QUITAR!!!)Y el alineamiento ¿forward?: ¿Lo hacemos también?
-
 #### Alineamiento múltiple
 
 Los parámetros utilizados para realizar este proceso fueron:
@@ -141,21 +144,12 @@ Y este alineamiento múltiple:
 
 #### Comparación y logo
 
-Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. procesos son mmmmmmmmmm
+Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. procesos son **mmmmmmmmmm**
 
-El logo que se obtiene utilizando el alineamiento múltiple mediante Clustal Omega es:
+Cargamos las librerías necesarias, caragamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
 
-**Está mal, hay que intentar hacerlo en otro sitio (ejemplo paquete de R)**
-
-**Explicar un poco el proceso por el que se han obtenido los distintos logos**
-
-![Logo del MSA.](Ej2/Logo_clustal.png)
-
-Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley.edu/logo.cgi
-
-## Hacer logo en R:
-
-```{r}
+```{r} 
+#| warning: false
 # Instalar paquetes si no los tienes (solo una vez)
 #if (!requireNamespace("BiocManager", quietly = TRUE))
     #install.packages("BiocManager")
@@ -166,17 +160,79 @@ Utilizamos la herramienta proporcionada en este enlace: https://weblogo.berkeley
 library(Biostrings)  # Para manejar secuencias
 library(ggseqlogo)   # Para crear el logo
 library(ggplot2)     # Para personalización gráfica
+```
 
-# --- 1. Cargar el alineamiento (formato FASTA) ---
+##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+
+```{r}
+# 1. Cargar el alineamiento (formato FASTA) 
+alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM40.fa")  
+
+# 2. Convertir a matriz de frecuencias
+matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
+ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+
+# 3. Crear el logo
+ggseqlogo(matriz_frec, 
+          method = "bits",         # Escala en bits (alternativa: "probability")
+          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
+          col_scheme = "chemistry",# Esquema de colores para proteínas
+          font = "helvetica_bold"  # Fuente
+) + 
+  labs(
+    title = "Logo del alineamiento progresivo con la Blosum40",
+    x = "Posición en el alineamiento",
+    y = "Bits de información"
+  ) +
+  theme_classic() +               # Estilo del gráfico
+  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+
+# 4. Guardar el logo (opcional)
+#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
+```
+
+##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+
+```{r}
+# 1. Cargar el alineamiento (formato FASTA) 
+alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM62.fa")  
+
+# 2. Convertir a matriz de frecuencias
+matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
+ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
+
+# 3. Crear el logo
+ggseqlogo(matriz_frec, 
+          method = "bits",         # Escala en bits (alternativa: "probability")
+          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
+          col_scheme = "chemistry",# Esquema de colores para proteínas
+          font = "helvetica_bold"  # Fuente
+) + 
+  labs(
+    title = "Logo del alineamiento progresivo con la Blosum62",
+    x = "Posición en el alineamiento",
+    y = "Bits de información"
+  ) +
+  theme_classic() +               # Estilo del gráfico
+  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
+
+# 4. Guardar el logo (opcional)
+#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
+```
+
+##### Logo del MSA por Clustal Omega
+
+```{r} 
+# 1. Cargar el alineamiento (formato FASTA)
 alineamiento <- readAAStringSet("clustalo-I20250321-165928-0743-92365021-p1m.fa")  # Para proteínas
 # Si es ADN, usa: readDNAStringSet()
 
-# --- 2. Convertir a matriz de frecuencias ---
+# 2. Convertir a matriz de frecuencias
 # Alternativa: calcular manualmente la matriz
 matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
 ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
 
-# --- 3. Crear el logo ---
+# 3. Crear el logo
 ggseqlogo(matriz_frec, 
           method = "bits",         # Escala en bits (alternativa: "probability")
           seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
@@ -195,29 +251,5 @@ ggseqlogo(matriz_frec,
 #ggsave("logo_secuenciaClustalW.png", width = 10, height = 5, dpi = 300)
 ```
 
-```{r}
-# --- 1. Cargar el alineamiento (formato FASTA) ---
-alineamiento <- readAAStringSet("Alineamiento_final_BLOUSUM40.fa")  
+#### Escogemos un logo/alineamiento:
 
-# --- 2. Convertir a matriz de frecuencias ---
-matriz_frec <- consensusMatrix(alineamiento, as.prob = TRUE)[1:20,]
-ggseqlogo(matriz_frec, method = "bits", seq_type = "aa")
-
-# --- 3. Crear el logo ---
-ggseqlogo(matriz_frec, 
-          method = "bits",         # Escala en bits (alternativa: "probability")
-          seq_type = "aa",         # "aa" para proteínas, "dna" para ADN
-          col_scheme = "chemistry",# Esquema de colores para proteínas
-          font = "helvetica_bold"  # Fuente
-) + 
-  labs(
-    title = "Logo de secuencia generado desde ClustalW",
-    x = "Posición en el alineamiento",
-    y = "Bits de información"
-  ) +
-  theme_classic() +               # Estilo del gráfico
-  theme(plot.title = element_text(hjust = 0.5))  # Centrar título
-
-# --- 4. Guardar el logo (opcional) ---
-#ggsave("logo_secuenciaBLOUSUM40.png", width = 10, height = 5, dpi = 300)
-```
