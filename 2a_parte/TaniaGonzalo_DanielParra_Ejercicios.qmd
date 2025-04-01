@@ -88,7 +88,7 @@ Y el alineamiento progresivo:
 
 ##### Con parámetros por defecto
 
-También, debido a que Clustal Omega utiliza una tabla BLOSUM62, decidimos repetir este proceso pero dejando los parámetros que vienen por defecto:
+También, decidimos repetir este proceso pero dejando los parámetros que vienen por defecto, para comprobar si generaríamos el mismo alineamiento independientemente de los parámetros escogidos:
 
 ![Parámetros para el alineamiento dos a dos por defecto.](Ej2/Parametros_pairwise_por_defecto.png)
 
@@ -124,7 +124,7 @@ Finalmente, construímos el guide tree:
 
 Y el alineamiento progresivo:
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOUSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
 
 
 #### Alineamiento múltiple
@@ -143,14 +143,16 @@ Y este alineamiento múltiple:
 
 #### Comparación y logo
 
-Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega. Los alineamientos progresivos obtenidos en los alineamientos 2 a 2 con la BLOUSUM40 y BLOUSUM62, son muy semejantes, variando únicamente por a posición de la segunda prolina (P) de la S1, debido a la utilización de distintas matrices de sustitución y los diferentes valores utilizados para penalizar los gaps.
+Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega; siendo común entre ellos únicamente el grupo S4-S5. 
 
-Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad, en el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
+Respecto a los alineamientos progresivos obtenidos en los alineamientos 2 a 2 con la BLOSUM40 y BLOSUM62, son muy semejantes, variando únicamente por a posición de la segunda prolina (P) de la S1, debido a la utilización de distintas matrices de sustitución y los diferentes valores utilizados para penalizar los gaps.
 
-Cargamos las librerías necesarias, caragamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
+Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad. En el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
 
 
-##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la BLOSUM40
+
+Cargamos las librerías necesarias, cargamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
 
 ```{python}
 from Bio import AlignIO
@@ -186,7 +188,7 @@ logo = logomaker.Logo(
 logo.ax.set_ylim(0, 4.32)
 
 # Personalización adicional
-logo.ax.set_title("Logo de alineamiento progresivo con la Blosum40")
+logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM40")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
 logo.ax.set_ylim(0, 3)
@@ -195,7 +197,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la Blosum40
+##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la BLOSUM40
 
 ```{python}
 from Bio import AlignIO
@@ -231,7 +233,7 @@ logo = logomaker.Logo(
 logo.ax.set_ylim(0, 4.32)
 
 # Personalización adicional
-logo.ax.set_title("Logo de alineamiento progresivo con la Blosum62")
+logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM62")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
 logo.ax.set_ylim(0, 3)
@@ -277,7 +279,7 @@ logo = logomaker.Logo(
 logo.ax.set_ylim(0, 4.32)
 
 # Personalización adicional
-logo.ax.set_title("Logo de alineamiento ClustalW")
+logo.ax.set_title("Logo de alineamiento Clustal Omega")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
 logo.ax.set_ylim(0, 3)
@@ -286,4 +288,4 @@ plt.tight_layout()
 plt.show()
 ```
 
-De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSOUM62.
+De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
