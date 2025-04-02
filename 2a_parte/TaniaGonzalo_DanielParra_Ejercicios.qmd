@@ -333,7 +333,7 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(frequency_matrix, \
+information_matrix = logomaker.transform_matrix(counts_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -358,7 +358,7 @@ plt.show()
 
 Podemos observar la representación gráfica del logo de alineamiento progresivo basado en la matriz de sustitución BLOSUM40. Este tipo de visualización permite evaluar la conservación y variabilidad de secuencias de aminoácidos en alineaciones múltiples, proporcionando información relevante sobre la evolución y estructura de las proteínas.
 
-En el eje vertical aparecn representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
+En el eje vertical aparecen representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
 
 Cada color indica propiedades de los aminoácidos de forma que los aminoácidos azules son los básicos; los rojos los aminoácidos ácidos; los verdes polares no cargados; los morados, aromáticos; los verde oscuro, residuos especiales y los negro, hidrofóbicos. 
 
@@ -367,6 +367,10 @@ Cada color indica propiedades de los aminoácidos de forma que los aminoácidos 
 Conservación de Posiciones: Cuando un aminoácido aparece con un tamaño grande en una posición específica, se infiere que es altamente conservado dentro de la alineación. Esto sugiere una importancia funcional o estructural de ese residuo.
 
 Variabilidad: Posiciones en las que aparecen múltiples aminoácidos con tamaños reducidos indican una mayor variabilidad en la secuencia, lo que puede estar relacionado con regiones menos estructuradas o con flexibilidad evolutiva.
+
+### Opinión Dani:
+dejaría los dos párrafos de arriba, pero los de abajo los quitaría, porque debería de haber entonces una explicación para la 62 y el clustal.
+###
 
 Uso de BLOSUM40: La matriz de sustitución BLOSUM40 se emplea para detectar similitudes moderadas entre proteínas, siendo particularmente útil en estudios filogenéticos y de comparación de estructuras proteicas.
 
@@ -386,7 +390,7 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(frequency_matrix, \
+information_matrix = logomaker.transform_matrix(counts_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -423,7 +427,7 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(frequency_matrix, \
+information_matrix = logomaker.transform_matrix(counts_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -445,13 +449,13 @@ plt.tight_layout()
 plt.show()
 ```
 
-De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
+De los tres logos obtenidos, podemos destacar que aquel con más variabilidad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
 
 <!-- Conclusiones:
 
 Se logró una alineación progresiva coherente con los resultados obtenidos por Clustal Omega.
 
-Se identificaron regiones conservadas y se representaron mediante un logo de secuencias.
+Se identificaron regiones conservadas y se representaron mediante un logo de secuencias.  ### De todas creo que la mejor es esta, pero de cara a la 62, señalando que es en la que más regiones conservadas se pueden encontrar.
 
 El uso de la matriz BLOSUM40 y penalizaciones por gap permitió obtener alineamientos con una calidad comparable a la obtenida en el ejercicio anterior.
 
