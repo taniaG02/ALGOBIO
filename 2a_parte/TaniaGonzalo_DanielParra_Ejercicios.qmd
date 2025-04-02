@@ -13,35 +13,35 @@ lang: es
 
 *Las dos secuencias están dispuestas en una matriz en la Tabla 1. Las secuencias comienzan en la esquina superior derecha, y las penalizaciones por desfase inicial se enumeran en cada posición inicial de desfase. La penalización por desfase se considera -8. Las puntuaciones de similitud Si,j procedentes de la búsqueda de coincidencias proceden de la tabla BLOSUM40.*
 
-
 Para resolver este ejercicio, hemos aplicado el algoritmo de Needleman-Wunsch para alinear dos secuencias de proteínas que nos indican: una parte de la hemoglobina (HGSAQVKGHG) y una parte de la mioglobina (KTEAEMKASEDLKKHGT). Este algoritmo de alineamiento global nos permite encontrar la mejor correspondencia entre las secuencias considerando inserciones, eliminaciones y sustituciones de aminoácidos.
 
 Para llevar a cabo la alineación, seguimos los siguientes pasos:
 
-1. **Inicialización de la matriz**: Se construyó una matriz en la que las secuencias se dispusieron en los ejes horizontal y vertical. Se asignaron penalizaciones de apertura de brecha (-8) en la primera fila y la primera columna.
+1.  **Inicialización de la matriz**: Se construyó una matriz en la que las secuencias se dispusieron en los ejes horizontal y vertical. Se asignaron penalizaciones de apertura de brecha (-8) en la primera fila y la primera columna.
 
-2. **Cálculo de los valores en la matriz**: Cada celda se llenó utilizando la fórmula de Needleman-Wunsch:
+2.  **Cálculo de los valores en la matriz**: Cada celda se llenó utilizando la fórmula de Needleman-Wunsch:
 
-   $$
-   F(i,j) = \max \begin{cases} 
-   F(i-1,j-1) + S(i,j) & \text{(match o mismatch según la matriz BLOSUM40)} \\
-   F(i-1,j) + \text{gap penalty} & \text{(inserción)} \\
-   F(i,j-1) + \text{gap penalty} & \text{(eliminación)}
-   \end{cases}
-   $$
+    $$
+    F(i,j) = \max \begin{cases} 
+    F(i-1,j-1) + S(i,j) & \text{(match o mismatch según la matriz BLOSUM40)} \\
+    F(i-1,j) + \text{gap penalty} & \text{(inserción)} \\
+    F(i,j-1) + \text{gap penalty} & \text{(eliminación)}
+    \end{cases}
+    $$
 
-   Donde $S(i,j)$ es el puntaje de sustitución obtenido de la matriz BLOSUM40.
-   
-   La tabla obtenida se muestra en @fig-ej1 donde aparecen todas las celdas rellenas además de las flechas indicativas de la procedencia de cada uno de los números para posteriormente poder llevar a cabo la recontrucción del alineamiento.
+    Donde $S(i,j)$ es el puntaje de sustitución obtenido de la matriz BLOSUM40.
 
-3. **Obtención del score final**: Una vez completada la matriz, el score final de alineación se encuentra en la casilla inferior derecha (@fig-ej1). Como podemos observar, en nuestro caso el score optenido es de -21.
+    La tabla obtenida se muestra en @fig-ej1 donde aparecen todas las celdas rellenas además de las flechas indicativas de la procedencia de cada uno de los números para posteriormente poder llevar a cabo la recontrucción del alineamiento.
 
-4. **Retroceso para encontrar las alineaciones óptimas**: Siguiendo las flechas que indicaban la mejor elección en cada celda, realizamos un recorrido inverso para reconstruir los alineamientos óptimos. Encontramos dos posibles caminos (alternativas), lo que dio lugar a dos alineaciones diferentes, ambos mostrados en la parte inferior de la @fig-ej1.
+3.  **Obtención del score final**: Una vez completada la matriz, el score final de alineación se encuentra en la casilla inferior derecha (@fig-ej1). Como podemos observar, en nuestro caso el score optenido es de -21.
+
+4.  **Retroceso para encontrar las alineaciones óptimas**: Siguiendo las flechas que indicaban la mejor elección en cada celda, realizamos un recorrido inverso para reconstruir los alineamientos óptimos. Encontramos dos posibles caminos (alternativas), lo que dio lugar a dos alineaciones diferentes, ambos mostrados en la parte inferior de la @fig-ej1.
 
 Este procedimiento nos permitió obtener una alineación óptima de las secuencias, teniendo en cuenta tanto coincidencias como penalizaciones por inserciones y eliminaciones.
 
 ![Solución manual del ejercicio 1. En la parte superior se mmuestra la matriz obtenida tras la aplicación del algoritmo de Needleman-Wunsch. En la parte inferior se muestran los dos alineamientos óptimos obtenidos.](Solucion_Ej1_Dani.jpeg){#fig-ej1}
 
+{{< pagebreak >}}
 
 ### Ejercicio 2 (6 puntos)
 
@@ -61,23 +61,59 @@ Este procedimiento nos permitió obtener una alineación óptima de las secuenci
 
 *Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.*
 
-#### Métodos
+Para la resolución de este ejercicio nos piden levar a cabo un alineación global de secuencias mediante alineación progresiva, donde el conjunto de secuencias con las que se trabaja es:
 
-Para este ejercicio decidimos utilizar EMBOSS Needle, Pairwise Sequence Alignment (PSA) para realizar los distintos alineamientos dos a dos; y Clustal Omega (1.2.4), Multiple Sequence Alignment (MSA) para el alineamiento múltiple.
+| Secuencia | Cadena     |
+|-----------|------------|
+| S1        | PPGVKSDCAS |
+| S2        | PADGVKDCAS |
+| S3        | PPDGKSDS   |
+| S4        | GADGKDCCS  |
+| S5        | GADGKDCAS  |
 
-Los alineamientos progresivos y guide trees correspondientes a los alineamientos dos a dos, los realizamos a mano.
+### Metodología
 
-Finalmente, obtuvimos los logos en R, utilizando los paquetes Biostrings, ggseqlogo y ggplot2.
+Para este ejercicio se utilizó el método de alineación progresiva para realizar el alineamiento global de las secuencias. Se llevaron a cabo los siguientes pasos:
 
-#### Alineamientos dos a dos
+-   **Alineamientos por pares**: Se utilizaron las herramientas EMBOSS Needle y Pairwise Sequence Alignment (PSA) para generar alineamientos dos a dos entre las secuencias.
 
-Los parámetros que utilizamos para realizar este proceso son:
+-   **Construcción de la matriz de distancias**: A partir de los alineamientos, se calculó una matriz de distancias basada en los valores de similitud entre las secuencias de forma manual.
 
-![Parámetros para el alineamiento dos a dos.](Ej2/Parametros_pairwise.png)
+-   **Generación del árbol guía de forma manual**: Se empleó el método de unión de vecinos (Neighbor Joining) para construir el árbol guía a partir de la matriz de distancias.
 
-Decidimos intentar mantener unos parámetros próximos a los utilizados en el ejercicio 1: una tabla BLOSUM40 y restar 10 por cada gap (lo más próximo a 8 que estaba disponible).
+-   **Alineamiento progresivo manual**: Utilizando el árbol guía, se realizó el alineamiento progresivo de las secuencias.
 
-Obtuvimos los siguientes alineamientos son sus scores correspondientes, calculados dividiendo el número de coincidencias entre el número de residuos sin tener en cuenta los gaps:
+-   **Comparación con Clustal Omega**: Se comparó el alineamiento obtenido con el generado por Clustal Omega (1.2.4).
+
+-   **Generación del logo de secuencias**: Finalmente, se representó el alineamiento en formato de logo ignorando los caracteres nulos o gaps mediante el uso de las siguientes librerías en Python para el análisis y visualización de secuencias biológicas: `Biopython` (módulo AlignIO) para la manipulación de alineamientos de secuencias, `Logomaker` para la generación de logotipos de secuencia, `Matplotlib` para la visualización gráfica y `NumPy` para el procesamiento numérico.
+
+#### 1. Alineamientos por pares
+
+Para los alineamientos por pares se utilizaron los siguientes parámetros:
+
+-   **Matriz de sustitución**: BLOSUM40
+-   **Penalización por gap**: -10 (aproximado a -8, usado en el ejercicio anterior)
+
+Estos también se muestran en la figura @fig-ej2-1.
+
+![Parámetros para el alineamiento dos a dos.](Ej2/Parametros_pairwise.png){#fig-ej2-1}
+
+Se calcularon los alineamientos y sus respectivos scores, definidos como la relación entre el número de coincidencias y la cantidad total de residuos (excluyendo gaps). Los resultados obtenidos fueron los siguientes:
+
+| Secuencias comparadas | Longitud 1 | Longitud 2 | Coincidencias | Score |
+|-----------------------|------------|------------|---------------|-------|
+| S1 vs S2              | 10         | 10         | 8             | 8/10  |
+| S1 vs S3              | 10         | 8          | 5             | 5/9   |
+| S1 vs S4              | 10         | 9          | 4             | 8/19  |
+| S1 vs S5              | 10         | 9          | 5             | 10/19 |
+| S2 vs S3              | 10         | 8          | 4             | 4/9   |
+| S2 vs S4              | 10         | 9          | 7             | 14/19 |
+| S2 vs S5              | 10         | 9          | 8             | 16/19 |
+| S3 vs S4              | 8          | 9          | 4             | 8/17  |
+| S3 vs S5              | 8          | 9          | 3             | 6/17  |
+| S4 vs S5              | 9          | 9          | 8             | 8/9   |
+
+Los resultados de los alineamientos obtenidos los podemos observar a continuación:
 
 ![Alineamiento dos a dos de S1 vs S2, con 10 aa cada secuencia y 8 coincidencias, tiene un score 8/10.](Ej2/Alineamiento_2a2_S1-S2.png)
 
@@ -99,26 +135,62 @@ Obtuvimos los siguientes alineamientos son sus scores correspondientes, calculad
 
 ![Alineamiento dos a dos de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9.](Ej2/Alineamiento_2a2_S4-S5.png)
 
+#### 2. Construcción de la matriz de distancias
 
-Y construímos la matriz de distancias, para la cual hacemos 1 - el score de similitud del alinemaiento:
+La matriz de distancias se construyó a partir del score de similitud, aplicando la transformación:´ $$ d = 1 - \text{score} $$
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){width="80%"}
+Obteniendo la siguiente matriz de distancias que se puede observar en la parte superior de @fig-ej2-2:
 
-Finalmente, construímos el guide tree:
+|     | S1   | S2   | S3   | S4   | S5   |
+|-----|------|------|------|------|------|
+| S1  | 0.00 | 0.20 | 0.44 | 0.58 | 0.47 |
+| S2  | 0.20 | 0.00 | 0.56 | 0.26 | 0.16 |
+| S3  | 0.44 | 0.56 | 0.00 | 0.53 | 0.65 |
+| S4  | 0.58 | 0.26 | 0.53 | 0.00 | 0.11 |
+| S5  | 0.47 | 0.16 | 0.65 | 0.11 | 0.00 |
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){width="50%"}
+#### 3. Construcción del árbol guía de forma manual
 
-Y el alineamiento progresivo:
+A partir de la matriz de distancias, se generó el arbol guía utilizando el método de unión de vecinos (*Neighbor Joining*). El árbol guía obtenido muestra la relación evolutiva entre las secuencias y nos sirve como base para la alineación progresiva. El proceso de generación del arbol guía se hizo de forma manueal y se muestra en @fig-ej2-2.
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg)
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){#fig-ej2-2, width="80%"}
 
-##### Con parámetros por defecto
+El arbol guía obtenido finalmente fue el mostrado en @fig-ej2-3.
 
-También, decidimos repetir este proceso pero dejando los parámetros que vienen por defecto, para comprobar si generaríamos el mismo alineamiento independientemente de los parámetros escogidos:
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){#fig-ej2-3, width="50%"}
 
-![Parámetros para el alineamiento dos a dos por defecto.](Ej2/Parametros_pairwise_por_defecto.png)
+#### 4. Alineamiento progresivo manual
 
-Los alineamientos y scores obtenidos con estos parámetros fueron:
+Utilizando el árbol guía, se llevó a cabo el alineamiento progresivo de las secuencias. Este alineamiento se obtuvo manualmente y posteriormente se comparará con el resultado de Clustal Omega.
+
+El alineamiento final obtenido se muestra en @fig-ej2-4.
+
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg) {#fig-ej2-4}
+
+##### Cálculo con parámetros por defecto
+
+Además del cálculo utilizando BLOSUM40, se decidió repetir el proceso usando la matriz BLOSUM62 y los parámetros por defecto, para evaluar si el alineamiento final variaba en función de los parámetros. Los parámetros utilizados fueron los que se muestran en @fig-ej2-5.
+
+![Parámetros para el alineamiento dos a dos por defecto.](Ej2/Parametros_pairwise_por_defecto.png){#fig-ej2-5}
+
+Se realizaron los alineamientos por pares con estos parámetros y se generó una nueva matriz de distancias, un nuevo árbol guía y el alineamiento progresivo correspondiente.
+
+Los scores obtenidos con estos parámetros fueron se muestran en la siguiente tabla:
+
+| Secuencias comparadas | Longitud 1 | Longitud 2 | Coincidencias | Score |
+|-----------------------|------------|------------|---------------|-------|
+| S1 vs S2              | 10         | 10         | 7             | 7/10  |
+| S1 vs S3              | 10         | 8          | 5             | 5/9   |
+| S1 vs S4              | 10         | 9          | 4             | 8/19  |
+| S1 vs S5              | 10         | 9          | 5             | 10/19 |
+| S2 vs S3              | 10         | 8          | 4             | 4/9   |
+| S2 vs S4              | 10         | 9          | 7             | 14/19 |
+| S2 vs S5              | 10         | 9          | 8             | 16/19 |
+| S3 vs S4              | 8          | 9          | 3             | 6/17  |
+| S3 vs S5              | 8          | 9          | 3             | 6/17  |
+| S4 vs S5              | 9          | 9          | 8             | 8/9   |
+
+Y los alineamientos obtenidos se muestran a continuación:
 
 ![Alineamiento dos a dos con parámetros por defecto, de S1 vs S2, con 10 aa cada secuencia y 7 coincidencias, tiene un score 7/10.](Ej2/Alineamiento_2a2_S1-S2_def.png)
 
@@ -140,9 +212,13 @@ Los alineamientos y scores obtenidos con estos parámetros fueron:
 
 ![Alineamiento dos a dos con parámetros por defecto, de S4 vs S5, con 9 aa cada secuencia y 8 coincidencias, tiene un score 8/9.](Ej2/Alineamiento_2a2_S4-S5_def.png)
 
-La matriz de distancias correspondiente a estos alineamientos sería:
+Con ello, contruimos la matriz de distancias: 
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){width="80%"}
+\| \| S1 \| S2 \| S3 \| S4 \| S5 \| \|-----\|------\|------\|------\|------\|------\| \| S1 \| 0.00 \| 0.30 \| 0.44 \| 0.58 \| 0.47 \| \| S2 \| 0.30 \| 0.00 \| 0.56 \| 0.26 \| 0.16 \| \| S3 \| 0.44 \| 0.56 \| 0.00 \| 0.53 \| 0.65 \| \| S4 \| 0.58 \| 0.26 \| 0.53 \| 0.00 \| 0.11 \| \| S5 \| 0.47 \| 0.16 \| 0.65 \| 0.11 \| 0.00 \|
+
+Y se llevó a cabo el alineamiento progresivo de forma análaga al anteior (@fig-ej2-6)
+
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){#fig-ej2-6, width="80%"}
 
 Finalmente, construímos el guide tree:
 
@@ -151,7 +227,6 @@ Finalmente, construímos el guide tree:
 Y el alineamiento progresivo:
 
 ![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
-
 
 #### Alineamiento múltiple
 
@@ -169,12 +244,11 @@ Y este alineamiento múltiple:
 
 #### Comparación y logo
 
-Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega; siendo común entre ellos únicamente el grupo S4-S5. 
+Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega; siendo común entre ellos únicamente el grupo S4-S5.
 
 Respecto a los alineamientos progresivos obtenidos en los alineamientos 2 a 2 con la BLOSUM40 y BLOSUM62, son muy semejantes, variando únicamente por a posición de la segunda prolina (P) de la S1, debido a la utilización de distintas matrices de sustitución y los diferentes valores utilizados para penalizar los gaps.
 
 Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad. En el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
-
 
 ##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la BLOSUM40
 
@@ -187,7 +261,6 @@ import logomaker
 import matplotlib.pyplot as plt
 import numpy as np
 ```
-
 
 ```{python}
 # Cargar y procesar el alineamiento
@@ -319,3 +392,13 @@ plt.show()
 ```
 
 De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
+
+Conclusiones:
+
+Se logró una alineación progresiva coherente con los resultados obtenidos por Clustal Omega.
+
+Se identificaron regiones conservadas y se representaron mediante un logo de secuencias.
+
+El uso de la matriz BLOSUM40 y penalizaciones por gap permitió obtener alineamientos con una calidad comparable a la obtenida en el ejercicio anterior.
+
+Este ejercicio permitió comprender y aplicar el método de alineación progresiva, así como la importancia de la selección de parámetros adecuados para obtener alineamientos precisos y representativos de la relación entre secuencias.
