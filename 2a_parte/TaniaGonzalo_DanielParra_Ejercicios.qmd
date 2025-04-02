@@ -228,11 +228,11 @@ Y se llevó a cabo el alineamiento progresivo de forma análoga al anterior (@fi
 
 Finalmente, construimos el guide tree:
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width="50%"}
+![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){#fig-ej2-7, width="50%"}
 
-Y el alineamiento progresivo se muestra en la figura @fig-ej2-7
+Y el alineamiento progresivo se muestra en la figura @fig-ej2-8
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg){#fig-ej2-7}
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg){#fig-ej2-8}
 
 #### Alineamiento múltiple
 
@@ -244,25 +244,75 @@ Estos parámetros fueron configurados en Clustal Omega, una herramienta bioinfor
 
 Como resultado del proceso, se obtuvo el siguiente árbol guía, que representa la relación filogenética entre las secuencias alineadas:
 
-![Guide tree del alineamiento múltiple por Clustal Omega.](Ej2/GuideTree_clustalOmega_MSA.png)
+![Guide tree del alineamiento múltiple por Clustal Omega.](Ej2/GuideTree_clustalOmega_MSA.png){#fig-ej2-9}
 
 Finalmente, se generó el alineamiento múltiple de las secuencias, donde se pueden observar las similitudes y diferencias entre ellas:
 
-![Alineamiento múltiple por Clustal Omega.](Ej2/Alineamiento_clustalOmega_MSA_bonito.png)
+![Alineamiento múltiple por Clustal Omega.](Ej2/Alineamiento_clustalOmega_MSA_bonito.png){#fig-ej2-10}
 
 Este alineamiento nos permite analizar la conservación de regiones específicas, identificar mutaciones y establecer relaciones evolutivas entre las secuencias comparadas.
 
-#### Generación del logo de secuencias
+#### Resultados
 
-Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega; siendo común entre ellos únicamente el grupo S4-S5.
+##### Comparación alineamientos
 
-Respecto a los alineamientos progresivos obtenidos en los alineamientos 2 a 2 con la BLOSUM40 y BLOSUM62, son muy semejantes, variando únicamente por a posición de la segunda prolina (P) de la S1, debido a la utilización de distintas matrices de sustitución y los diferentes valores utilizados para penalizar los gaps.
+1. Primer alineamiento (manual, con BLOSUM40)(@fig-ej2-4):
+Existe una brecha significativa en S3 (representada por guiones), lo que indica una menor similitud con las demás secuencias.
+Las secuencias S4 y S5 muestran una alta conservación en sus posiciones (similitud cercana en aminoácidos).
 
-Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad. En el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
 
-##### Logo del alineamiento progresivo del alineamiento por pares mediante la BLOSUM40
+2. Segundo alineamiento (manual, con BLOSUM62) (@fig-ej2-8):
+Aparece una ligera variación en S1 (gap introducido en tras la segunda prolina (P) en lugar de tras la primera prolina (P). El resto de las secuencias mantiene el mismo patrón que en el primer alineamiento.
 
-Cargamos las librerías necesarias, cargamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
+Esto es debido a la utilización de distintas matrices de sustitución donde la matriz BLOSUM62 favorece la detección de similitudes más estrechas en secuencias altamente relacionadas y también cómo la matriz penaliza los gaps o prioriza substituciones específicas.
+
+3. Tercer alineamiento (Clustal Omega)(@fig-ej2-10):
+En este caso podemos ver que el alineamiento difiere bastante a los obtenindos de forma manual. Podemos observar menos gaps y, en caso de haberlos, estos se encuentran en los extremos (menor número de brechas y una mayor continuidad), es decir, presenta un mayor número de aminoácidos alineados, lo que puede ser el resultado de la automatización del proceso.
+
+Con todo ello, podemos concluir que en todos los casos, S4 y S5 presentan una alta conservación, consolidando que están estrechamente relacionadas. La mayor diferencia se encuentra en la cadena S3, donde los métodos manuales marcan a S3 como más divergente (más gaps), pero Clustal Omega lo integra más en el alineamiento (mismatch en lugar de gaps).
+
+Esto puede deberse a que Clustal Omega se basa en un algoritmo heurístico y, por tanto, no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps. Además, debemos tener en cuenta la importancia de los parámetros introducidos para que esta se ajuste a la realidad. En el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos. También hay que considerar que Clustal Omega usa el método HHalign, que es un algoritmo basado en modelos de Markov ocultos (HMM), para realizar alineamientos más precisos entre perfiles de secuencias.
+
+##### Comparación de árboles guía
+
+Como hemos mostrado anteriormente, se realizaron finalmente tres arboles diferentes (@fig-ej2-3, @fig-ej2-7, @fig-ej2-9):
+
+1. Árbol basado en BLOSUM40 (manual, alineamiento progresivo y vecinos cercanos):
+  - S4 y S5 son los más cercanos, agrupándose como un clado separado.
+  - S1 y S2 son también los más cercanos, agrupándose como un clado separado.
+  - Estos dos clado formados son unen en un antecesor común.
+  - S3 es el más distante, uniéndose finalmente al resto.
+
+2. Árbol basado en BLOSUM62 (manual, alineamiento progresivo y vecinos cercanos):
+
+La estructura difiere de la obtenida con la matriz BLOSUM40. En este caso:
+  - S4 y S5 están más estrechamente relacionados.
+  - S2 se incorpora al grupo S4-S5.
+  - S1 se une después al conjunto principal.
+  - S3 es el más distante, uniéndose finalmente al resto.
+
+Esto refleja que cambiar la matriz de sustitución (BLOSUM40 vs. BLOSUM62) afecta a las relaciones globales en la construcción del arbol guía mediante este método.
+
+3. Árbol generado por Clustal Omega:
+Los resultados en este caso se presentan en un formato numérico con distancias específicas:
+  - S4 y S5 siguen siendo los más cercanos, con una distancia de 0.055556 .
+  - S2 se sitúa más lejos de S4 y S5, con una distancia de 0.25 .
+  - S1 y S3 forman un subgrupo con una distancia de 0.1875 , diferente a los árboles manuales.
+
+Podemos observar que este método introduce diferencias en cómo se agrupan S1 y S3 en comparación con los anteriores.
+
+Con todo ello, podemos concluir una relación S4-S5 consistente ya que en todos los métodos y matrices utilizadas, S4 y S5 son siempre los más cercanos, lo que indica una fuerte similitud entre estas secuencias. Además, hemos observado el impacto de qu tiene escoger una u otra matriz BLOSUM al comparar los resultados entre BLOSUM40 y BLOSUM62 y observando que el arbol guia obtenido es diferente. Por último, ninguno de los árboles obtenidos manuealmente coincide con el obtenido por el algoritmo Clustal Omega, que introduce distancias precisas e incluye la relación entre S1 y S3, no obtenido manualmente.
+
+
+#### Generación del logo a patir de los alineamientos obtenidos
+
+Para representar el alineamiento final en formato de logo, se utilizó el lenguaje de programación Python y las librerías `Biopython`, `logosmaker`, `matplotlib` y `numpy`. 
+
+En la construcción del logo, se ignoraron los gaps y se consideraron únicamente los residuos presentes en cada posición del alineamiento. Por ello, el número de aminoácido presentes es de 8 y, por tanto, el máximo valor que se puede obtener de cantidad de información (bits, representados en el eje y) es de 3.
+
+1. Logo del alineamiento obtenido usando BLOSUM40
+
+Cargamos las librerías necesarias, cargamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo correspondiente.
 
 ```{python}
 #Importación de librerías
@@ -278,26 +328,24 @@ alignment = AlignIO.read("Alineamiento_final_BLOUSUM40.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts',\
-   characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences,\
+    to_type='counts',\
+    characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
-# Convertir a frecuencias relativas (ignorando gaps)
-frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
-
-# Calcular información (en bits) para cada posición
+# Normalizar a frecuencias relativas y convertir a información (bits)
 information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
-# Crear el logo
+# Generar el logo
 logo = logomaker.Logo(
-    information_matrix,  # Usamos la matriz de información directamente
-    color_scheme='chemistry',
+    information_matrix, 
+    color_scheme='chemistry', #Colores por propiedades químicas
     font_name='Arial',
     show_spines=True,
-    stack_order='big_on_top'
+    stack_order='big_on_top' #Aminoácidos más frecuentes arriba
 )
 
-# Personalización adicional
+# Ajustar el estilo del gráfico
 logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM40")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
@@ -312,8 +360,7 @@ Podemos observar la representación gráfica del logo de alineamiento progresivo
 
 En el eje vertical aparecn representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
 
-explicar colores!!
-
+Cada color indica propiedades de los aminoácidos de forma que los aminoácidos azules son los básicos; los rojos los aminoácidos ácidos; los verdes polares no cargados; los morados, aromáticos; los verde oscuro, residuos especiales y los negro, hidrofóbicos. 
 
 <!-- Análisis e Interpretación:
 
@@ -326,8 +373,7 @@ Uso de BLOSUM40: La matriz de sustitución BLOSUM40 se emplea para detectar simi
 En conclusión, la representación en logo basada en BLOSUM40 proporciona una herramienta visual efectiva para analizar la conservación y diversidad de secuencias de aminoácidos, facilitando la interpretación de patrones evolutivos y funcionales en proteínas.-->
 
 
-
-##### Logo del alineamiento progresivo del alineamiento por pares mediante la BLOSUM62
+2. Logo del alineamiento obtenido usando BLOSUM62
 
 ```{python}
 # Cargar y procesar el alineamiento
@@ -335,27 +381,25 @@ alignment = AlignIO.read("Alineamiento_final_BLOUSUM62.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts',\
-   characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences,\
+    to_type='counts',\
+    characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
-# Convertir a frecuencias relativas (ignorando gaps)
-frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
-
-# Calcular información (en bits) para cada posición
+# Normalizar a frecuencias relativas y convertir a información (bits)
 information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
-# Crear el logo
+# Generar el logo
 logo = logomaker.Logo(
-    information_matrix,  # Usamos la matriz de información directamente
-    color_scheme='chemistry',
+    information_matrix, 
+    color_scheme='chemistry', #Colores por propiedades químicas
     font_name='Arial',
     show_spines=True,
-    stack_order='big_on_top'
+    stack_order='big_on_top' #Aminoácidos más frecuentes arriba
 )
 
-# Personalización adicional
-logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM62")
+# Ajustar el estilo del gráfico
+logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM40")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
 logo.ax.set_ylim(0, 3)
@@ -364,7 +408,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-##### Logo del alineamiento múltiples (MSA) por Clustal Omega
+3. Logo del alineamiento obtenido usando Clustal Omega
 
 ```{python}
 
@@ -374,27 +418,25 @@ alignment = AlignIO.read("clustalo-I20250321-165928-0743-92365021-p1m.fa", \
 sequences = [str(record.seq) for record in alignment]
 
 # Crear matriz de conteos (sin gaps)
-counts_matrix = logomaker.alignment_to_matrix(sequences, to_type='counts', \
-  characters_to_ignore='-')
+counts_matrix = logomaker.alignment_to_matrix(sequences,\
+    to_type='counts',\
+    characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
-# Convertir a frecuencias relativas (ignorando gaps)
-frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
-
-# Calcular información (en bits) para cada posición
+# Normalizar a frecuencias relativas y convertir a información (bits)
 information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
-# Crear el logo
+# Generar el logo
 logo = logomaker.Logo(
-    information_matrix,  # Usamos la matriz de información directamente
-    color_scheme='chemistry',
+    information_matrix, 
+    color_scheme='chemistry', #Colores por propiedades químicas
     font_name='Arial',
     show_spines=True,
-    stack_order='big_on_top'
+    stack_order='big_on_top' #Aminoácidos más frecuentes arriba
 )
 
-# Personalización adicional
-logo.ax.set_title("Logo de alineamiento Clustal Omega")
+# Ajustar el estilo del gráfico
+logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM40")
 logo.ax.set_xlabel("Posición")
 logo.ax.set_ylabel("Bits")
 logo.ax.set_ylim(0, 3)
