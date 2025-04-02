@@ -137,7 +137,7 @@ Los resultados de los alineamientos obtenidos los podemos observar a continuaci�
 
 #### 2. Construcción de la matriz de distancias
 
-La matriz de distancias se construyó a partir del score de similitud, aplicando la transformación:´ $$ d = 1 - \text{score} $$
+La matriz de distancias se construyó a partir del score de similitud, aplicando la transformación: $$ d = 1 - \text{score} $$
 
 Obteniendo la siguiente matriz de distancias que se puede observar en la parte superior de @fig-ej2-2:
 
@@ -153,11 +153,11 @@ Obteniendo la siguiente matriz de distancias que se puede observar en la parte s
 
 A partir de la matriz de distancias, se generó el arbol guía utilizando el método de unión de vecinos (*Neighbor Joining*). El árbol guía obtenido muestra la relación evolutiva entre las secuencias y nos sirve como base para la alineación progresiva. El proceso de generación del arbol guía se hizo de forma manueal y se muestra en @fig-ej2-2.
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){#fig-ej2-2, width="80%"}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){#fig-ej2-2 width="80%"}
 
 El arbol guía obtenido finalmente fue el mostrado en @fig-ej2-3.
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){#fig-ej2-3, width="50%"}
+![Guide Tree obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/GuideTree_Pairwise_BLOSUM40.jpeg){#fig-ej2-3 width="50%"}
 
 #### 4. Alineamiento progresivo manual
 
@@ -165,7 +165,7 @@ Utilizando el árbol guía, se llevó a cabo el alineamiento progresivo de las s
 
 El alineamiento final obtenido se muestra en @fig-ej2-4.
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg) {#fig-ej2-4}
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg){#fig-ej2-4}
 
 ##### Cálculo con parámetros por defecto
 
@@ -214,13 +214,19 @@ Y los alineamientos obtenidos se muestran a continuación:
 
 Con ello, contruimos la matriz de distancias: 
 
-\| \| S1 \| S2 \| S3 \| S4 \| S5 \| \|-----\|------\|------\|------\|------\|------\| \| S1 \| 0.00 \| 0.30 \| 0.44 \| 0.58 \| 0.47 \| \| S2 \| 0.30 \| 0.00 \| 0.56 \| 0.26 \| 0.16 \| \| S3 \| 0.44 \| 0.56 \| 0.00 \| 0.53 \| 0.65 \| \| S4 \| 0.58 \| 0.26 \| 0.53 \| 0.00 \| 0.11 \| \| S5 \| 0.47 \| 0.16 \| 0.65 \| 0.11 \| 0.00 \|
+| | S1 | S2 | S3 | S4 | S5 | 
+|-----|------|------|------|------|------| 
+| S1 | 0.00 | 0.30 | 0.44 | 0.58 | 0.47 | 
+| S2 | 0.30 | 0.00 | 0.56 | 0.26 | 0.16 | 
+| S3 | 0.44 | 0.56 | 0.00 | 0.53 | 0.65 | 
+| S4 | 0.58 | 0.26 | 0.53 | 0.00 | 0.11 | 
+| S5 | 0.47 | 0.16 | 0.65 | 0.11 | 0.00 |
 
-Y se llevó a cabo el alineamiento progresivo de forma análaga al anteior (@fig-ej2-6)
+Y se llevó a cabo el alineamiento progresivo de forma análoga al anterior (@fig-ej2-6)
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){#fig-ej2-6, width="80%"}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){#fig-ej2-6 width="80%"}
 
-Finalmente, construímos el guide tree:
+Finalmente, construimos el guide tree:
 
 ![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width="50%"}
 
@@ -393,7 +399,7 @@ plt.show()
 
 De los tres logos obtenidos, podemos destacar que aquel con más variedad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
 
-Conclusiones:
+<!-- Conclusiones:
 
 Se logró una alineación progresiva coherente con los resultados obtenidos por Clustal Omega.
 
@@ -401,4 +407,4 @@ Se identificaron regiones conservadas y se representaron mediante un logo de sec
 
 El uso de la matriz BLOSUM40 y penalizaciones por gap permitió obtener alineamientos con una calidad comparable a la obtenida en el ejercicio anterior.
 
-Este ejercicio permitió comprender y aplicar el método de alineación progresiva, así como la importancia de la selección de parámetros adecuados para obtener alineamientos precisos y representativos de la relación entre secuencias.
+Este ejercicio permitió comprender y aplicar el método de alineación progresiva, así como la importancia de la selección de parámetros adecuados para obtener alineamientos precisos y representativos de la relación entre secuencias.-->
