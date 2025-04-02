@@ -9,31 +9,57 @@ lang: es
 
 ### Ejercicio 1 (4 puntos)
 
-En este ejercicio probarás el algoritmo Needleman-Wunsch en una secuencia corta de partes de hemoglobina (código PDB 1AOW) y mioglobina 1 (código PDB 1AZI). Aquí alineará la secuencia HGSAQVKGHG con la secuencia KTEAEMKASEDLKKHGT.
+*En este ejercicio probarás el algoritmo Needleman-Wunsch en una secuencia corta de partes de hemoglobina (código PDB 1AOW) y mioglobina 1 (código PDB 1AZI). Aquí alineará la secuencia HGSAQVKGHG con la secuencia KTEAEMKASEDLKKHGT.*
 
-Las dos secuencias están dispuestas en una matriz en la Tabla 1. Las secuencias comienzan en la esquina superior derecha, y las penalizaciones por desfase inicial se enumeran en cada posición inicial de desfase. La penalización por desfase se considera -8. Las puntuaciones de similitud Si,j procedentes de la búsqueda de coincidencias proceden de la tabla BLOSUM40.
+*Las dos secuencias están dispuestas en una matriz en la Tabla 1. Las secuencias comienzan en la esquina superior derecha, y las penalizaciones por desfase inicial se enumeran en cada posición inicial de desfase. La penalización por desfase se considera -8. Las puntuaciones de similitud Si,j procedentes de la búsqueda de coincidencias proceden de la tabla BLOSUM40.*
 
-![Matriz y alineamientos obtenidos.](Solucion_Ej1_Dani.jpeg)
 
-Como se puede observar, La puntuación obtenida es -21 y se han encontrado dos alineamientos globales posibles.
+Para resolver este ejercicio, hemos aplicado el algoritmo de Needleman-Wunsch para alinear dos secuencias de proteínas que nos indican: una parte de la hemoglobina (HGSAQVKGHG) y una parte de la mioglobina (KTEAEMKASEDLKKHGT). Este algoritmo de alineamiento global nos permite encontrar la mejor correspondencia entre las secuencias considerando inserciones, eliminaciones y sustituciones de aminoácidos.
+
+Para llevar a cabo la alineación, seguimos los siguientes pasos:
+
+1. **Inicialización de la matriz**: Se construyó una matriz en la que las secuencias se dispusieron en los ejes horizontal y vertical. Se asignaron penalizaciones de apertura de brecha (-8) en la primera fila y la primera columna.
+
+2. **Cálculo de los valores en la matriz**: Cada celda se llenó utilizando la fórmula de Needleman-Wunsch:
+
+   $$
+   F(i,j) = \max \begin{cases} 
+   F(i-1,j-1) + S(i,j) & \text{(match o mismatch según la matriz BLOSUM40)} \\
+   F(i-1,j) + \text{gap penalty} & \text{(inserción)} \\
+   F(i,j-1) + \text{gap penalty} & \text{(eliminación)}
+   \end{cases}
+   $$
+
+   Donde $S(i,j)$ es el puntaje de sustitución obtenido de la matriz BLOSUM40.
+   
+   La tabla obtenida se muestra en @fig-ej1 donde aparecen todas las celdas rellenas además de las flechas indicativas de la procedencia de cada uno de los números para posteriormente poder llevar a cabo la recontrucción del alineamiento.
+
+3. **Obtención del score final**: Una vez completada la matriz, el score final de alineación se encuentra en la casilla inferior derecha (@fig-ej1). Como podemos observar, en nuestro caso el score optenido es de -21.
+
+4. **Retroceso para encontrar las alineaciones óptimas**: Siguiendo las flechas que indicaban la mejor elección en cada celda, realizamos un recorrido inverso para reconstruir los alineamientos óptimos. Encontramos dos posibles caminos (alternativas), lo que dio lugar a dos alineaciones diferentes, ambos mostrados en la parte inferior de la @fig-ej1.
+
+Este procedimiento nos permitió obtener una alineación óptima de las secuencias, teniendo en cuenta tanto coincidencias como penalizaciones por inserciones y eliminaciones.
+
+![Solución manual del ejercicio 1. En la parte superior se mmuestra la matriz obtenida tras la aplicación del algoritmo de Needleman-Wunsch. En la parte inferior se muestran los dos alineamientos óptimos obtenidos.](Solucion_Ej1_Dani.jpeg){#fig-ej1}
+
 
 ### Ejercicio 2 (6 puntos)
 
-Dado el conjunto de secuencias múltiples:
+*Dado el conjunto de secuencias múltiples:*
 
--   S1: PPGVKSDCAS
+-   *S1: PPGVKSDCAS*
 
--   S2: PADGVKDCAS
+-   *S2: PADGVKDCAS*
 
--   S3: PPDGKSDS
+-   *S3: PPDGKSDS*
 
--   S4: GADGKDCCS
+-   *S4: GADGKDCCS*
 
--   S5: GADGKDCAS
+-   *S5: GADGKDCAS*
 
-Utilice el popular método de alineación progresiva para alinear globalmente el conjunto anterior de secuencias. Genere el árbol guía por unión de vecinos. Compare su resultado (alineamiento) con el de Clustal-Omega.
+*Utilice el popular método de alineación progresiva para alinear globalmente el conjunto anterior de secuencias. Genere el árbol guía por unión de vecinos. Compare su resultado (alineamiento) con el de Clustal-Omega.*
 
-Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.
+*Con el alineamiento final representa el logo. Para este proposito los caracteres nulos o gap son ignorados y no cuentan para el número de observaciones de una columna.*
 
 #### Métodos
 
@@ -155,11 +181,15 @@ Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omeg
 Cargamos las librerías necesarias, cargamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
 
 ```{python}
+#Importación de librerías
 from Bio import AlignIO
 import logomaker
 import matplotlib.pyplot as plt
 import numpy as np
+```
 
+
+```{python}
 # Cargar y procesar el alineamiento
 alignment = AlignIO.read("Alineamiento_final_BLOUSUM40.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
