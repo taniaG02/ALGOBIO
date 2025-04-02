@@ -153,7 +153,7 @@ Obteniendo la siguiente matriz de distancias que se puede observar en la parte s
 
 A partir de la matriz de distancias, se generó el arbol guía utilizando el método de unión de vecinos (*Neighbor Joining*). El árbol guía obtenido muestra la relación evolutiva entre las secuencias y nos sirve como base para la alineación progresiva. El proceso de generación del arbol guía se hizo de forma manueal y se muestra en @fig-ej2-2.
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){#fig-ej2-2 width="80%"}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM40.jpeg){#fig-ej2-2}
 
 El arbol guía obtenido finalmente fue el mostrado en @fig-ej2-3.
 
@@ -165,7 +165,7 @@ Utilizando el árbol guía, se llevó a cabo el alineamiento progresivo de las s
 
 El alineamiento final obtenido se muestra en @fig-ej2-4.
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg){#fig-ej2-4}
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con parámetros similares al ejercicio 1.](Ej2/Alineamiento_Progresivo_BLOSUM40.jpeg){#fig-ej2-4 width="60%"}
 
 ##### Cálculo con parámetros por defecto
 
@@ -224,31 +224,35 @@ Con ello, contruimos la matriz de distancias:
 
 Y se llevó a cabo el alineamiento progresivo de forma análoga al anterior (@fig-ej2-6)
 
-![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){#fig-ej2-6 width="80%"}
+![Construcción de matrices de distancias.](Ej2/Matriz_distancias_BLOSUM62.jpeg){#fig-ej2-6}
 
 Finalmente, construimos el guide tree:
 
 ![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){width="50%"}
 
-Y el alineamiento progresivo:
+Y el alineamiento progresivo se muestra en la figura @fig-ej2-7
 
-![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg)
+![Alineamiento progresivo obtenido a partir de alineamientos 2 a 2 con matriz BLOSUM62](Ej2/Alineamiento_Progresivo_BLOSUM62.jpeg){#fig-ej2-7}
 
 #### Alineamiento múltiple
 
-Los parámetros utilizados para realizar este proceso fueron:
+Para llevar a cabo el alineamiento múltiple de secuencias, se utilizaron los siguientes parámetros:
 
 ![Parámetros para el alineamiento múltiple.](Ej2/Parametros_clustal.png)
 
-Obtivos el siguiente guide tree:
+Estos parámetros fueron configurados en Clustal Omega, una herramienta bioinformática para la alineación de secuencias.
+
+Como resultado del proceso, se obtuvo el siguiente árbol guía, que representa la relación filogenética entre las secuencias alineadas:
 
 ![Guide tree del alineamiento múltiple por Clustal Omega.](Ej2/GuideTree_clustalOmega_MSA.png)
 
-Y este alineamiento múltiple:
+Finalmente, se generó el alineamiento múltiple de las secuencias, donde se pueden observar las similitudes y diferencias entre ellas:
 
 ![Alineamiento múltiple por Clustal Omega.](Ej2/Alineamiento_clustalOmega_MSA_bonito.png)
 
-#### Comparación y logo
+Este alineamiento nos permite analizar la conservación de regiones específicas, identificar mutaciones y establecer relaciones evolutivas entre las secuencias comparadas.
+
+#### Generación del logo de secuencias
 
 Observamos que los guide tree obtenidos por ambos alineamientos dos a dos, difieren entre sí y con el guide tree obtenido por el Clustal Omega; siendo común entre ellos únicamente el grupo S4-S5.
 
@@ -256,7 +260,7 @@ Respecto a los alineamientos progresivos obtenidos en los alineamientos 2 a 2 co
 
 Ambas varían mucho del alineamiento múltiple obtenido mediante el Clustal Omega, debido a que este método es heurístico y no garantiza encontrar el alineamiento globalmente óptimo, teniendo dificultad frente a deleciones e inserciones, en las que incluye gaps; siendo crucial la importancia de los parámetros introducidos para que esta se ajuste a la realidad. En el peor de los casos se utilizan valores predeterminados (como ocurre con Clustal Omega (1.2.4)), que pueden no ser ideales para todo el conjunto de datos.
 
-##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la BLOSUM40
+##### Logo del alineamiento progresivo del alineamiento por pares mediante la BLOSUM40
 
 Cargamos las librerías necesarias, cargamos los documentos FASTA de los alineamientos progresivos y obtuvimos el logo de ambos alineamientos dos a dos y del Clustal Omega.
 
@@ -293,9 +297,6 @@ logo = logomaker.Logo(
     stack_order='big_on_top'
 )
 
-# Limitar bits a 4.32 si es necesario
-logo.ax.set_ylim(0, 4.32)
-
 # Personalización adicional
 logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM40")
 logo.ax.set_xlabel("Posición")
@@ -306,14 +307,29 @@ plt.tight_layout()
 plt.show()
 ```
 
-##### Logo del alineamiento progresivo del alineamiento dos a dos mediante la BLOSUM40
+
+Podemos observar la representación gráfica del logo de alineamiento progresivo basado en la matriz de sustitución BLOSUM40. Este tipo de visualización permite evaluar la conservación y variabilidad de secuencias de aminoácidos en alineaciones múltiples, proporcionando información relevante sobre la evolución y estructura de las proteínas.
+
+En el eje vertical aparecn representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
+
+explicar colores!!
+
+
+<!-- Análisis e Interpretación:
+
+Conservación de Posiciones: Cuando un aminoácido aparece con un tamaño grande en una posición específica, se infiere que es altamente conservado dentro de la alineación. Esto sugiere una importancia funcional o estructural de ese residuo.
+
+Variabilidad: Posiciones en las que aparecen múltiples aminoácidos con tamaños reducidos indican una mayor variabilidad en la secuencia, lo que puede estar relacionado con regiones menos estructuradas o con flexibilidad evolutiva.
+
+Uso de BLOSUM40: La matriz de sustitución BLOSUM40 se emplea para detectar similitudes moderadas entre proteínas, siendo particularmente útil en estudios filogenéticos y de comparación de estructuras proteicas.
+
+En conclusión, la representación en logo basada en BLOSUM40 proporciona una herramienta visual efectiva para analizar la conservación y diversidad de secuencias de aminoácidos, facilitando la interpretación de patrones evolutivos y funcionales en proteínas.-->
+
+
+
+##### Logo del alineamiento progresivo del alineamiento por pares mediante la BLOSUM62
 
 ```{python}
-from Bio import AlignIO
-import logomaker
-import matplotlib.pyplot as plt
-import numpy as np
-
 # Cargar y procesar el alineamiento
 alignment = AlignIO.read("Alineamiento_final_BLOUSUM62.fa", "fasta")
 sequences = [str(record.seq) for record in alignment]
@@ -338,9 +354,6 @@ logo = logomaker.Logo(
     stack_order='big_on_top'
 )
 
-# Limitar bits a 4.32 si es necesario
-logo.ax.set_ylim(0, 4.32)
-
 # Personalización adicional
 logo.ax.set_title("Logo de alineamiento progresivo con la BLOSUM62")
 logo.ax.set_xlabel("Posición")
@@ -351,13 +364,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-##### Logo del MSA por Clustal Omega
+##### Logo del alineamiento múltiples (MSA) por Clustal Omega
 
 ```{python}
-from Bio import AlignIO
-import logomaker
-import matplotlib.pyplot as plt
-import numpy as np
 
 # Cargar y procesar el alineamiento
 alignment = AlignIO.read("clustalo-I20250321-165928-0743-92365021-p1m.fa", \
@@ -383,9 +392,6 @@ logo = logomaker.Logo(
     show_spines=True,
     stack_order='big_on_top'
 )
-
-# Limitar bits a 4.32 si es necesario
-logo.ax.set_ylim(0, 4.32)
 
 # Personalización adicional
 logo.ax.set_title("Logo de alineamiento Clustal Omega")
