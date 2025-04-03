@@ -39,7 +39,7 @@ Para llevar a cabo la alineación, seguimos los siguientes pasos:
 
 Este procedimiento nos permitió obtener una alineación óptima de las secuencias, teniendo en cuenta tanto coincidencias como penalizaciones por inserciones y eliminaciones.
 
-![Solución manual del ejercicio 1. En la parte superior se mmuestra la matriz obtenida tras la aplicación del algoritmo de Needleman-Wunsch. En la parte inferior se muestran los dos alineamientos óptimos obtenidos.](Solucion_Ej1_Dani.jpeg){#fig-ej1}
+![Solución manual del ejercicio 1. En la parte superior se muestra la matriz obtenida tras la aplicación del algoritmo de Needleman-Wunsch. En la parte inferior se muestran los dos alineamientos óptimos obtenidos.](Solucion_Ej1_Dani.jpeg){#fig-ej1}
 
 {{< pagebreak >}}
 
@@ -282,9 +282,7 @@ Como hemos mostrado anteriormente, se realizaron finalmente tres arboles diferen
   - Estos dos clado formados son unen en un antecesor común.
   - S3 es el más distante, uniéndose finalmente al resto.
 
-2. Árbol basado en BLOSUM62 (manual, alineamiento progresivo y vecinos cercanos):
-
-La estructura difiere de la obtenida con la matriz BLOSUM40. En este caso:
+2. Árbol basado en BLOSUM62 (manual, alineamiento progresivo y vecinos cercanos). La estructura difiere de la obtenida con la matriz BLOSUM40. En este caso:
   - S4 y S5 están más estrechamente relacionados.
   - S2 se incorpora al grupo S4-S5.
   - S1 se une después al conjunto principal.
