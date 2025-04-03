@@ -262,7 +262,7 @@ Las secuencias S4 y S5 muestran una alta conservación en sus posiciones (simili
 
 
 2. Segundo alineamiento (manual, con BLOSUM62) (@fig-ej2-8):
-Aparece una ligera variación en S1 (gap introducido en tras la segunda prolina (P) en lugar de tras la primera prolina (P). El resto de las secuencias mantiene el mismo patrón que en el primer alineamiento.
+Aparece una ligera variación en S1 (gap introducido en tras la segunda prolina (P) en lugar de tras la primera prolina (P)). El resto de las secuencias mantiene el mismo patrón que en el primer alineamiento.
 Esto es debido a la utilización de distintas matrices de sustitución donde la matriz BLOSUM62 favorece la detección de similitudes más estrechas en secuencias altamente relacionadas y también cómo la matriz penaliza los gaps o prioriza substituciones específicas.
 
 3. Tercer alineamiento (Clustal Omega)(@fig-ej2-10):
@@ -299,7 +299,7 @@ Los resultados en este caso se presentan en un formato numérico con distancias 
   - S1 y S3 forman un subgrupo con una distancia de 0.1875 , diferente a los árboles manuales.
   Podemos observar que este método introduce diferencias en cómo se agrupan S1 y S3 en comparación con los anteriores.
 
-Con todo ello, podemos concluir una relación S4-S5 consistente ya que en todos los métodos y matrices utilizadas, S4 y S5 son siempre los más cercanos, lo que indica una fuerte similitud entre estas secuencias. Además, hemos observado el impacto de qu tiene escoger una u otra matriz BLOSUM al comparar los resultados entre BLOSUM40 y BLOSUM62 y observando que el arbol guia obtenido es diferente. Por último, ninguno de los árboles obtenidos manuealmente coincide con el obtenido por el algoritmo Clustal Omega, que introduce distancias precisas e incluye la relación entre S1 y S3, no obtenido manualmente.
+Con todo ello, podemos concluir una relación S4-S5 consistente ya que en todos los métodos y matrices utilizadas, S4 y S5 son siempre los más cercanos, lo que indica una fuerte similitud entre estas secuencias. Además, hemos observado el impacto que tiene escoger la penalización por gaps y entre una u otra matriz BLOSUM al comparar los resultados entre BLOSUM40 y BLOSUM62 y observando que el arbol guia obtenido es diferente. Por último, ninguno de los árboles obtenidos manualmente coincide con el obtenido por el algoritmo Clustal Omega, que introduce distancias precisas e incluye la relación entre S1 y S3, obtenido por Clustal Omega (1.2.4).
 
 
 #### Generación del logo a patir de los alineamientos obtenidos
@@ -359,7 +359,7 @@ plt.show()
 
 Podemos observar la representación gráfica del logo de alineamiento progresivo basado en la matriz de sustitución BLOSUM40. Este tipo de visualización permite evaluar la conservación y variabilidad de secuencias de aminoácidos en alineaciones múltiples, proporcionando información relevante sobre la evolución y estructura de las proteínas.
 
-En el eje vertical aparecen representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
+En el eje vertical aparecen representados los bits que señalan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
 
 Cada color indica propiedades de los aminoácidos de forma que los aminoácidos azules son los básicos; los rojos los aminoácidos ácidos; los verdes polares no cargados; los morados, aromáticos; los verde oscuro, residuos especiales y los negro, hidrofóbicos.
 
@@ -474,11 +474,11 @@ Con todo ello, concluimos que el logo obtenido por Clustal Omega es el que prese
 
 #### Concluiónes final:
 
-El uso de diferentes matrices de sustitución afecta la conservación y la variabilidad en el alineamiento. BLOSUM40 favorece secuencias más distantes, mientras que BLOSUM62 es más adecuado para secuencias cercanas. Además, hemos podido obsrvar como los alineamientos manuales tienden a reflejar las decisiones del usuario en la construcción del alineamiento (por ejemplo, la introducción de gaps puede ser en ocasiones arbitraria), lo que puede generar patrones de conservación diferentes a los obtenidos mediante métodos automáticos como Clustal Omega.
+El uso de diferentes matrices de sustitución afecta la conservación y la variabilidad en el alineamiento. BLOSUM40 favorece secuencias más filogenéticamente distantes, mientras que BLOSUM62 es más adecuado para secuencias cercanas. Además, hemos podido observar como los alineamientos manuales tienden a reflejar las decisiones del usuario en la construcción del alineamiento (por ejemplo, la introducción de gaps puede ser en ocasiones arbitraria), lo que puede generar patrones de conservación diferentes a los obtenidos mediante métodos automáticos como Clustal Omega.
 
 Clustal Omega introduce una variabilidad diferente debido a su método de clustering, lo que puede dar lugar a alineamientos distintos, especialmente en regiones menos conservadas. Estas discrepancias en la conservación de ciertas posiciones pueden ser el resultado de cómo se ponderan las sustituciones en cada método, destacando la importancia de elegir la matriz y el algoritmo adecuados para cada conjunto de secuencias.
 
-Con todo ello, podemos decir que, en general, el método de alineamiento y la matriz de sustitución pueden influir en la representación final de la conservación de secuencias. A pesar de ello, este ejercicio nos ha permitido identificar regiones conservadas y representarlas mediente un logo de secuencias usando métodos alternativos y nos ha permitido comprender cómo funcionan este tipo de algoritmos de alineamiento múltiple progresivos. 
+Con todo ello, podemos decir que, en general, el método de alineamiento y la matriz de sustitución pueden influir en la representación final de la conservación de secuencias. A pesar de ello, este ejercicio nos ha permitido identificar regiones conservadas y representarlas mediente un logo de secuencias usando métodos alternativos; y comprender cómo funcionan este tipo de algoritmos de alineamiento múltiple progresivos. 
 
 <!-- Conclusiones:
 
