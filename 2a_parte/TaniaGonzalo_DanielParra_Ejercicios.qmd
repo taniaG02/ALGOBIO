@@ -79,7 +79,7 @@ Para este ejercicio se utilizó el método de alineación progresiva para realiz
 
 -   **Construcción de la matriz de distancias**: A partir de los alineamientos, se calculó una matriz de distancias basada en los valores de similitud entre las secuencias de forma manual.
 
--   **Generación del árbol guía de forma manual**: Se empleó el método de unión de vecinos (Neighbor Joining) para construir el árbol guía a partir de la matriz de distancias.
+-   **Generación del árbol guía de forma manual**: Se empleó el método de unión de vecinos (*Neighbor Joining*) para construir el árbol guía a partir de la matriz de distancias.
 
 -   **Alineamiento progresivo manual**: Utilizando el árbol guía, se realizó el alineamiento progresivo de las secuencias.
 
@@ -143,10 +143,10 @@ Obteniendo la siguiente matriz de distancias que se puede observar en la parte s
 
 |     | S1   | S2   | S3   | S4   | S5   |
 |-----|------|------|------|------|------|
-| S1  | 0.00 | 0.20 | 0.44 | 0.58 | 0.47 |
-| S2  | 0.20 | 0.00 | 0.56 | 0.26 | 0.16 |
-| S3  | 0.44 | 0.56 | 0.00 | 0.53 | 0.65 |
-| S4  | 0.58 | 0.26 | 0.53 | 0.00 | 0.11 |
+| S1  | 0.00 |   -  |   -  |   -  |   -  |
+| S2  | 0.20 | 0.00 |   -  |   -  |   -  |
+| S3  | 0.44 | 0.56 | 0.00 |   -  |   -  |
+| S4  | 0.58 | 0.26 | 0.53 | 0.00 |   -  |
 | S5  | 0.47 | 0.16 | 0.65 | 0.11 | 0.00 |
 
 #### 3. Construcción del árbol guía de forma manual
@@ -216,10 +216,10 @@ Con ello, contruimos la matriz de distancias:
 
 | | S1 | S2 | S3 | S4 | S5 | 
 |-----|------|------|------|------|------| 
-| S1 | 0.00 | 0.30 | 0.44 | 0.58 | 0.47 | 
-| S2 | 0.30 | 0.00 | 0.56 | 0.26 | 0.16 | 
-| S3 | 0.44 | 0.56 | 0.00 | 0.53 | 0.65 | 
-| S4 | 0.58 | 0.26 | 0.53 | 0.00 | 0.11 | 
+| S1 | 0.00 |   -  |   -  |   -  |   -  | 
+| S2 | 0.30 | 0.00 |   -  |   -  |   -  | 
+| S3 | 0.44 | 0.56 | 0.00 |   -  |   -  | 
+| S4 | 0.58 | 0.26 | 0.53 | 0.00 |   -  | 
 | S5 | 0.47 | 0.16 | 0.65 | 0.11 | 0.00 |
 
 Y se llevó a cabo el alineamiento progresivo de forma análoga al anterior (@fig-ej2-6)
@@ -228,7 +228,7 @@ Y se llevó a cabo el alineamiento progresivo de forma análoga al anterior (@fi
 
 Finalmente, construimos el guide tree:
 
-![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){#fig-ej2-7, width="50%"}
+![Guide Tree obtenido a partir de alineamientos 2 a 2](Ej2/GuideTree_Pairwise_BLOSUM62.jpeg){#fig-ej2-7 width="50%"}
 
 Y el alineamiento progresivo se muestra en la figura @fig-ej2-8
 
@@ -242,11 +242,11 @@ Para llevar a cabo el alineamiento múltiple de secuencias, se utilizaron los si
 
 Estos parámetros fueron configurados en Clustal Omega, una herramienta bioinformática para la alineación de secuencias.
 
-Como resultado del proceso, se obtuvo el siguiente árbol guía, que representa la relación filogenética entre las secuencias alineadas:
+Como resultado del proceso, se obtuvo el siguiente árbol guía, que representa la relación filogenética entre las secuencias alineadas (@fig-ej2-9).
 
 ![Guide tree del alineamiento múltiple por Clustal Omega.](Ej2/GuideTree_clustalOmega_MSA.png){#fig-ej2-9}
 
-Finalmente, se generó el alineamiento múltiple de las secuencias, donde se pueden observar las similitudes y diferencias entre ellas:
+Finalmente, se generó el alineamiento múltiple de las secuencias, donde se pueden observar las similitudes y diferencias entre ellas (@fig-ej2-10).
 
 ![Alineamiento múltiple por Clustal Omega.](Ej2/Alineamiento_clustalOmega_MSA_bonito.png){#fig-ej2-10}
 
@@ -263,7 +263,6 @@ Las secuencias S4 y S5 muestran una alta conservación en sus posiciones (simili
 
 2. Segundo alineamiento (manual, con BLOSUM62) (@fig-ej2-8):
 Aparece una ligera variación en S1 (gap introducido en tras la segunda prolina (P) en lugar de tras la primera prolina (P). El resto de las secuencias mantiene el mismo patrón que en el primer alineamiento.
-
 Esto es debido a la utilización de distintas matrices de sustitución donde la matriz BLOSUM62 favorece la detección de similitudes más estrechas en secuencias altamente relacionadas y también cómo la matriz penaliza los gaps o prioriza substituciones específicas.
 
 3. Tercer alineamiento (Clustal Omega)(@fig-ej2-10):
@@ -298,15 +297,14 @@ Los resultados en este caso se presentan en un formato numérico con distancias 
   - S4 y S5 siguen siendo los más cercanos, con una distancia de 0.055556 .
   - S2 se sitúa más lejos de S4 y S5, con una distancia de 0.25 .
   - S1 y S3 forman un subgrupo con una distancia de 0.1875 , diferente a los árboles manuales.
-
-Podemos observar que este método introduce diferencias en cómo se agrupan S1 y S3 en comparación con los anteriores.
+  Podemos observar que este método introduce diferencias en cómo se agrupan S1 y S3 en comparación con los anteriores.
 
 Con todo ello, podemos concluir una relación S4-S5 consistente ya que en todos los métodos y matrices utilizadas, S4 y S5 son siempre los más cercanos, lo que indica una fuerte similitud entre estas secuencias. Además, hemos observado el impacto de qu tiene escoger una u otra matriz BLOSUM al comparar los resultados entre BLOSUM40 y BLOSUM62 y observando que el arbol guia obtenido es diferente. Por último, ninguno de los árboles obtenidos manuealmente coincide con el obtenido por el algoritmo Clustal Omega, que introduce distancias precisas e incluye la relación entre S1 y S3, no obtenido manualmente.
 
 
 #### Generación del logo a patir de los alineamientos obtenidos
 
-Para representar el alineamiento final en formato de logo, se utilizó el lenguaje de programación Python y las librerías `Biopython`, `logosmaker`, `matplotlib` y `numpy`. 
+Para representar el alineamiento final en formato de logo, se utilizó el lenguaje de programación Python y las librerías `Biopython`, `Logosmaker`, `Matplotlib` y `NumPy`. 
 
 En la construcción del logo, se ignoraron los gaps y se consideraron únicamente los residuos presentes en cada posición del alineamiento. Por ello, el número de aminoácido presentes es de 8 y, por tanto, el máximo valor que se puede obtener de cantidad de información (bits, representados en el eje y) es de 3.
 
@@ -332,8 +330,11 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     to_type='counts',\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
+
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(counts_matrix, \
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -360,7 +361,9 @@ Podemos observar la representación gráfica del logo de alineamiento progresivo
 
 En el eje vertical aparecen representados los bits que representan la cantidad de información en cada posición de la secuencia. Valores altos indican una mayor conservación de los aminoácidos en esa posición. En el eje horizontal tenemos las posiciones de la secuencia donde podemos obervar la ubicación específica de los aminoácidos en la alineación. En el logo en sí aparecen representadas las letras correspondientes a un aminoácido concreto, y su tamaño refleja la frecuencia con la que aparece en una posición determinada.
 
-Cada color indica propiedades de los aminoácidos de forma que los aminoácidos azules son los básicos; los rojos los aminoácidos ácidos; los verdes polares no cargados; los morados, aromáticos; los verde oscuro, residuos especiales y los negro, hidrofóbicos. 
+Cada color indica propiedades de los aminoácidos de forma que los aminoácidos azules son los básicos; los rojos los aminoácidos ácidos; los verdes polares no cargados; los morados, aromáticos; los verde oscuro, residuos especiales y los negro, hidrofóbicos.
+
+Así, podemos obsrvar que que algunos aminoácidos como "G", "V", "K", "S" y "D" tienen una alta conservación en posiciones clave, mientras que otros presentan más variabilidad.
 
 <!-- Análisis e Interpretación:
 
@@ -389,8 +392,11 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     to_type='counts',\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
+
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(counts_matrix, \
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -411,6 +417,10 @@ logo.ax.set_ylim(0, 3)
 plt.tight_layout()
 plt.show()
 ```
+
+
+En este caso, el alineamiento progresivo se hizo con la matriz BLOSUM62, que tiene un mayor poder discriminativo para secuencias más cercanas evolutivamente. Podemos observar similitudes con el primer logo, pero algunas posiciones presentan diferencias en los aminoácidos predominantes o en su grado de conservación. Por ejemplo, la posición de "A" y "S" en el extremo derecho muestra una ligera diferencia en la proporción de letras, lo que sugiere un efecto de la matriz en la ponderación de las sustituciones. También existen discrepancias en la posición 2, donde podemos observar que en este caso solo tenemos un aminoácido ("D") mientras que en el primer caso también teníamos "P"
+
 
 3. Logo del alineamiento obtenido usando Clustal Omega
 
@@ -426,8 +436,11 @@ counts_matrix = logomaker.alignment_to_matrix(sequences,\
     to_type='counts',\
     characters_to_ignore='-') # Excluir gaps para evitar sesgos
 
+# Convertir a frecuencias relativas (ignorando gaps)
+frequency_matrix = counts_matrix.div(counts_matrix.sum(axis=1), axis=0)
+
 # Normalizar a frecuencias relativas y convertir a información (bits)
-information_matrix = logomaker.transform_matrix(counts_matrix, \
+information_matrix = logomaker.transform_matrix(frequency_matrix, \
   from_type='probability', to_type='information')
 
 # Generar el logo
@@ -449,7 +462,23 @@ plt.tight_layout()
 plt.show()
 ```
 
-De los tres logos obtenidos, podemos destacar que aquel con más variabilidad en las posiciones es el obtenido por el alineamiento de Clustal Omega y el que posee más similitudes es el resultante del alineamiento progresivo dos a dos mediante la BLOSUM62.
+En este caso podemos observar una mayor variabilidad en las posiciones iniciales del alineamiento, con diferencias notables en la conservación de ciertas posiciones clave en comparación con los otros dos métodos. La distribución de letras es distinta en varias posiciones, como ya habíamos comentado anteriormente (apartado de comparación de alineamientos y árbol guía).
+
+##### Comparación de logos
+
+Los alineamientos manuales muestran una mayor conservación en ciertas posiciones, lo que puede deberse a que el árbol guía fue construido a mano con una estrategia específica, cambiando únicamente el uso de una matriz u otra mientras que Clustal Omega parece permitir una mayor variabilidad en algunas posiciones, lo que puede reflejar una optimización diferente basada en heurísticas computacionales.
+
+La diferencia entre los logos generados con BLOSUM40 y BLOSUM62 indica que la elección de la matriz afecta la ponderación de las sustituciones, con BLOSUM62 favoreciendo conservaciones más estrictas. BLOSUM40, al estar diseñado para secuencias más divergentes, permite más variabilidad en algunas posiciones, lo que queda reflejado en el logo (posición 2).
+
+Con todo ello, concluimos que el logo obtenido por Clustal Omega es el que presenta mayor variabilidad en las posiciones, mientras que el logo de forma manual mediante el uso de la matriz BLOSUM62 es el que presenta mayor conservación (posiciones 2, 3, 4, 5, 6, 7, 8 y 10) en todas las secuencias comparadas. 
+
+#### Concluiónes final:
+
+El uso de diferentes matrices de sustitución afecta la conservación y la variabilidad en el alineamiento. BLOSUM40 favorece secuencias más distantes, mientras que BLOSUM62 es más adecuado para secuencias cercanas. Además, hemos podido obsrvar como los alineamientos manuales tienden a reflejar las decisiones del usuario en la construcción del alineamiento (por ejemplo, la introducción de gaps puede ser en ocasiones arbitraria), lo que puede generar patrones de conservación diferentes a los obtenidos mediante métodos automáticos como Clustal Omega.
+
+Clustal Omega introduce una variabilidad diferente debido a su método de clustering, lo que puede dar lugar a alineamientos distintos, especialmente en regiones menos conservadas. Estas discrepancias en la conservación de ciertas posiciones pueden ser el resultado de cómo se ponderan las sustituciones en cada método, destacando la importancia de elegir la matriz y el algoritmo adecuados para cada conjunto de secuencias.
+
+Con todo ello, podemos decir que, en general, el método de alineamiento y la matriz de sustitución pueden influir en la representación final de la conservación de secuencias. A pesar de ello, este ejercicio nos ha permitido identificar regiones conservadas y representarlas mediente un logo de secuencias usando métodos alternativos y nos ha permitido comprender cómo funcionan este tipo de algoritmos de alineamiento múltiple progresivos. 
 
 <!-- Conclusiones:
 
