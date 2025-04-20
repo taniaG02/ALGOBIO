@@ -1,0 +1,1049 @@
+---
+title: "Análisis de comunidades microbianas usando el amplicon 16S"
+subtitle: "1. Determinación de las AVs y filtrado"
+author: "Tania Gonzalo Santana"
+date: "Abril 2025"
+format:
+      pdf:
+            highlight-style: pygments
+---
+
+# Introducción: Análisis de microbiota intestinal en ratones
+Este cuaderno documenta el análisis de la microbiota intestinal en ratones sometidos a diferentes condiciones térmicas —temperatura ambiente (~22 °C) y frío (6 °C)— a lo largo de distintos momentos del experimento (días 0, 11 y 31) y en diferentes tejidos (heces y ciego). Las muestras de heces se recolectaron en los tres puntos temporales, mientras que las del ciego solo en el día 31. El ADN bacteriano fue extraído utilizando el kit QIAamp Fast DNA Stool Mini Kit (Qiagen).
+
+Los datos analizados proceden del estudio publicado por Chevalier et al. (DOI: [10.1016/j.cell.2015.11.004](https://doi.org/10.1016/j.cell.2015.11.004) disponible bajo el identificador SRA SRP065234. En dicho trabajo se investiga cómo la exposición al frío modifica la composición de la microbiota intestinal, y cómo dicha microbiota, al ser transferida a ratones libres de gérmenes, mejora la sensibilidad a la insulina, promueve la conversión de grasa blanca y aumenta el gasto energético. El conjunto de datos y metadatos, que incluyen el día de recolección, la temperatura experimental y el tejido analizado, fue proporcionado a través de la plataforma de la asignatura.
+
+El análisis de la composición bacteriana se llevó a cabo mediante la técnica de betabarcoding del gen 16S del ARN ribosomal, enfocándose en la región V4. Se empleó secuenciación paired-end con tecnología MiSeq, utilizando cebadores bacterianos universales con códigos de barras. A continuación, se muestran las secuencias utilizadas:
+
+#### Cebadores actualizados (Parada & Apprill)
+
+- **Forward (515F-Y)**: `GTGYCAGCMGCCGCGGTAA` (19 pb) 
+- **Reverse (806R)**: `GGACTACNVGGGTWTCTAAT` (20 pb)
+
+#### Cebadores originales (Caporaso & Caporaso)
+
+- **Forward (515F)**:`GTGCCAGCMGCCGCGGTAA` (19 pb)
+- **Reverse (806R)**: `GGACTACHVGGGTWTCTAAT` (20 pb)
+
+El amplicón generado tiene una longitud aproximada de 252 pb, lo que permite un solapamiento suficiente para unir las lecturas (\≥ 20 nt), facilitando el ensamblaje (*merge*) y la asignación de OTUs de novo.
+
+El formato y enfoque del informe han sido adaptados según el contenido del temario impartido en la asignatura.
+
+<!--Inciso sobre primers: 
+Los primers que mencionaste corresponden a la amplificación de la región V4 del gen 16S rRNA. 
+-Nombres de los primers
+* Forward primer (GTGYCAGCMGCCGCGGTAA) → 515F (o 515F-Y en la versión modificada)
+* Reverse primer (GGACTACNVGGGTWTCTAAT) → 806R
+
+515F/806R es una de las parejas de primers más utilizadas en estudios de microbioma
+La versión 515F-Y es una modificación del 515F original para mejorar la cobertura de arqueas y bacterias en ambientes marinos (Parada et al., 2016).
+la nomenclatura estándar, los primers que mencionaste se llaman 515F - 806R y amplifican la región V4 del 16S rRNA.
+
+806-515 = 291 -> si quitamos el tamaño de los primers es -19-20 = 252pb 
+
+El fragmento amplificado por estos primers suele tener un tamaño aproximado de ~291-295 pares de bases (pb), dependiendo de la composición específica de la muestra.
+
+Detalles
+515F: Se une aproximadamente en la posición 515 del gen 16S rRNA (Escherichia coli numeración).
+806R: Se une aproximadamente en la posición 806 del gen 16S rRNA.
+Tamaño esperado del amplicón:
+806−515=291 pb
+Pero puede variar ligeramente según la especie bacteriana (~291-295 pb).
+con tener lecturas de 150 pb solapan  -- necesitamos como minimo 20 nts de solpamiento para hacer el merge.
+-->
+## Importación de los datos
+
+```{r loading_data}
+load("20250419.RData")
+```
+
+## Importación de librería necesarias para el proyecto
+
+```{r loading_libraries , message=FALSE, cache=TRUE }
+library("dada2")
+library ("ggplot2")
+library("DECIPHER")
+library("ShortRead")
+library("Biostrings")
+library("readr")
+library("phyloseq")
+library("DESeq2")
+library("tibble")
+library("dplyr")
+library("tidyr")
+library("openssl")
+library("vegan")
+library("microbiome")
+library("hrbrthemes")
+library("RColorBrewer")
+library("data.table")
+```
+
+## Ubicación de los archivos raw fastq
+EN primerlugar, comprobamos cuántos archivos de secuencias tenemos en la carpeta fastq/. Para ello usamos `list.files()` con un filtro que solo seleccione los archivos que terminan en `_1.fastq`, que corresponde con las lecturas hacia adelante (forward reads). Además, verificamos el número de ficheros correspondientes a las lecturas foward (`_1.fastq`) y reverse (`_2.fastq`) para asegurarnos de que los datos están completos.
+
+Como los archivos estaban comprimidos (.fastq.gz), los descomprimimos primero usando Bash. Para ello, navegamos a la carpeta donde están los archivos y posteriormente jecutamos gunzip `*fastq.gz` para descomprimir todos.
+
+```{r checking_sequences , message=FALSE, cache=TRUE}
+# Listar los archivos forward (_1.fastq)
+forward_reads <- list.files(path = "./ejerciciomicrobioma/fastq/", pattern = "_1.fastq")
+print (forward_reads)
+cat("Número de archivos de lecturas forward:", length(forward_reads), "\n")
+
+# Listar los archivos reverse (_2.fastq) para comprobar que hay el mismo número
+reverse_reads <- list.files(path = "./ejerciciomicrobioma/fastq/", pattern = "_2.fastq")
+cat("Número de archivos de lecturas reverse:", length(reverse_reads), "\n")
+```
+Como funciona correctamente, nos generamos un vector con los nombres de los archivos foward (fnFs) y otro con los de reverse (fnRs). Además, generamos un vector con los nombres de las muestras (sample.names) que usaremos para nombrar los archivos después de filtrarlos.
+
+```{r}
+fnFs <- sort(list.files(path="./ejerciciomicrobioma/fastq/", pattern="_1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path="./ejerciciomicrobioma/fastq/", pattern="_2.fastq", full.names = TRUE))
+
+# Extraemos los nombres de las muestras:
+sample.names <- sapply(strsplit(basename(fnFs), ".1_"), `[`, 1)
+print("Lista de archivos hacia adelante")
+print (fnFs)
+print("Lista de archivos reversos")
+print (fnRs)
+print("Nombres de las muestras")
+print (sample.names)
+```
+
+## Verificación de la presencia de primers en las lecturas
+Como estamos analizando productos de PCR, las secuencias de los primers pueden estar presentes e introducir un sesgo técnico en las regiones 5' y 3' del amplificón. Por ello, es necesario comprobar la presencia de primers en nuestras secuencias y, en caso de tenerlos, estos deben ser eliminados mediante el herramientas como **Cutadapt**.
+
+Para la comprobaciónd e la presencia de primers el primer paso es definirlos con sus correspondientes secuencias complementarias inversas. Además, se define la función `allOrients` para obtener todas las combinaciones posibles gracias al uso del paquete **Biostrings**. Para ello, primero es necesario convertir las secuencias de las variables de texto a objetos **DNAString** y luego convertir el resultado de nuevo a cadena de texto usando la función `toString`. Este proceso se lleva a cabo tanto para los primers actualizados como para los primers originales. 
+
+```{r primers_actualizados}
+# Definimos los primers (actualizados)
+FWD.act <- "GTGYCAGCMGCCGCGGTAA"
+REV.act <- "GGACTACNVGGGTWTCTAAT"
+
+# Definimos función
+allOrients <- function(primer) {
+    require(Biostrings)
+    dna <- DNAString(primer)
+    orients <- c(Forward = dna, 
+                 Complement = Biostrings::complement(dna), 
+                 Reverse = reverse(dna), 
+                 RevComp = reverseComplement(dna))
+    return(sapply(orients, toString))
+}
+
+# Diferentes orientaciones
+FWD.act.orients <- allOrients(FWD.act)
+REV.act.orients <- allOrients(REV.act)
+
+# Visualizar 
+print (FWD.act.orients)
+print (REV.act.orients)
+```
+
+```{r primers_originales}
+# Definimos los primers (originales)
+FWD.ori <- "GTGCCAGCMGCCGCGGTAA"
+REV.ori <- "GGACTACHVGGGTWTCTAAT"
+
+# Diferentes orientaciones
+FWD.ori.orients <- allOrients(FWD.ori)
+REV.ori.orients <- allOrients(REV.ori)
+
+# Visualizar
+print (FWD.ori.orients)
+print (REV.ori.orients)
+```
+
+Podemos verificar que los primers actualizados y original son diferentes.
+
+```{r}
+REV.ori.orients == REV.act.orients
+FWD.ori.orients == FWD.act.orients
+```
+
+Una vez definidos los primers y todas sus posibles orientaciones, se procede a verificar si esas secuencias están o no en nuestras lecturas. Para ello, definimos la función `primerHits`.
+
+```{r primerHits_function}
+# Definimos la función
+primerHits <- function(primer, fn) {
+    nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+    return(sum(nhits > 0))
+}
+```
+
+Posteiormente, verificamos la presencia de todas las orientaciones de primers en todas los ficheros (muestras). 
+
+```{r eval=FALSE}
+# Crear una lista vacía para almacenar los resultados
+resultados_lista <- lapply(seq_along(fnFs), function(i) {
+  data.frame(
+    Sample = basename(fnFs[i]),
+    FWD.ForwardReads = sapply(FWD.act.orients, primerHits, fn = fnFs[i]),
+    FWD.ReverseReads = sapply(FWD.act.orients, primerHits, fn = fnRs[i]),
+    REV.ForwardReads = sapply(REV.act.orients, primerHits, fn = fnFs[i]),
+    REV.ReverseReads = sapply(REV.act.orients, primerHits, fn = fnRs[i])
+  )
+})
+
+# Combinar los data frames en uno solo
+resultados <- do.call(rbind, resultados_lista)
+```
+
+```{r}
+# Mostrar resultados
+print(resultados)
+```
+
+Podemos observar que algunos de los archivos contienen secuencias correspondientes a los cebadores (primers); sin embargo, su presencia es muy limitada. Por tanto, no se considera necesario realizar un recorte de las lecturas para eliminarlos.
+
+Este análisis también puede repetirse utilizando el otro par de cebadores disponibles (primers originales).
+
+```{r eval=FALSE}
+# Crear una lista vacía para almacenar los resultados
+resultados_lista_ori <- lapply(seq_along(fnFs), function(i) {
+  data.frame(
+    Sample = basename(fnFs[i]), 
+    FWD.ForwardReads = sapply(FWD.ori.orients, primerHits, fn = fnFs[i]),
+    FWD.ReverseReads = sapply(FWD.ori.orients, primerHits, fn = fnRs[i]),
+    REV.ForwardReads = sapply(REV.ori.orients, primerHits, fn = fnFs[i]),
+    REV.ReverseReads = sapply(REV.ori.orients, primerHits, fn = fnRs[i])
+  )
+})
+
+# Combinar los data frames en uno solo
+resultados_ori <- do.call(rbind, resultados_lista_ori)
+```
+
+```{r}
+# Mostrar resultados
+print(resultados_ori)
+```
+
+Nuevamente, se observa la misma tendencia, por lo que se concluye que no es necesario llevar a cabo el recorte de las secuencias para eliminar los cebadores.
+
+::: {.note}
+*Nota*: Para confirmar esta decisión, se realizó un análisis adicional aplicando el recorte de cebadores mediante la herramienta **Cutadapt**. No se obtuvieron diferencias significativas en los resultados, y, además, se observó una pérdida de secuencias y longitud de lecturas. Los análisis de calidad posteriores con FastQC tampoco mostraron mejoras relevantes. Por estas razones, se optó por no mostrar dichos resultados y continuar el análisis sin aplicar el recorte, ya que esta opción también resulta menos costosa a nivel computacional.
+:::
+
+## Filtrado de lecturas por calidad
+Tras confirmar que la mayoría de las lecturas no contienen cebadores (y por consiguiente, tampoco adaptadores de secuenciación), se procedió al filtrado por calidad utilizando la función `filterAndTrim` del paquete `dada2`.
+
+### Análisis de perfiles de calidad
+Primero se evaluó el perfil de calidad de cada archivo mediante la función `plotQualityProfile` de`dada2`. Dado el elevado número de muestras, se optó por generar un gráfico agregado que muestra los valores promedio de calidad (`aggregate=TRUE`).
+
+```{r forwardfilesquality, message=FALSE, cache=TRUE}
+# Generar el gráfico de calidad 
+forwplot <- plotQualityProfile(fnFs[1:length(fnFs)], aggregate=TRUE) + 
+                     geom_hline(yintercept=c(15,25,35), 
+                                color=c("red","blue","green"), 
+                                linewidth=0.5)
+
+# Mostrar el gráfico
+print(forwplot)
+```
+<!--#SIN cuatadapt
+Resumen de Recorte
+Inicio: Recortar las primeras 13 bases.
+Final: Truncar las lecturas en la posición 246.-->
+
+En el gráfico generado podemos la escala de grises representan un mapa de calor de la frecuencia de cada *score* de calidad en cada posición de nucleótido. La línea verde indica la calidad media por posición, mientras que las líneas naranjas muestran los cuartiles de la distribución de calidades. La línea roja (plana en este caso) representa la proporción de lecturas que alcanzan cada posición, una característica típica de Illumina, donde todas las lecturas tienen igual longitud. 
+
+Los resultados muestran que las lecturas *forward* presentan una buena calidad general, aunque debemos recortar ciertos nucleótidos en los extremos 3´ y 5´ para minimizar errores. Con base en esto, se seleccionaron los siguientes parámetros de filtrado: un punto de corte inicial en la posición **13** (para eliminar la región de baja calidad en 3') y un punto de truncado en la posición **246** (eliminando así los últimos 4 nucleótidos).
+
+Del mismo modo se analizó la calidad de las lecturas reversas:
+
+```{r reversefilesquality, warning = FALSE, message=FALSE, cache=TRUE}
+# Generar el gráfico de calidad 
+revqplot <- plotQualityProfile(fnRs[1:length(fnRs)], aggregate=TRUE) + 
+                     geom_hline(yintercept=c(15,25,35), 
+                                color=c("red","blue","green"),
+                                linewidth=0.5)
+# Mostrar el gráfico
+print(revqplot)
+```
+
+<!--Resumen de Recorte
+Inicio: Recortar las primeras 6 bases.
+Final: Truncar las lecturas en la posición 170. -- cortar todo lo que baje de Q25 (es lo que recomienda el profe)-->
+
+En el caso de las lecturas *reverse*, como suele ser habitual, se observa una calidad menor en comparación con las *forward*. La calidad se mantiene aceptable en las primeras posiciones, pero desciende notablemente a partir de la posición \~170, donde la media cae por debajo de Q25. Debido a este comportamiento, se seleccionaron los siguientes parámetros de filtrado: un punto de corte inicial en la posición **6** (para eliminar posibles artefactos o baja calidad en el extremo 3´) y un punto de truncado en la posición **170**, evitando así las regiones con calidad deteriorada hacia el final de las lecturas.
+
+### Filtrado y recorte de lecturas
+Para el filtrado y el recorte de las lecturas, se prepararon los archivos de salida para almacenar las lecturas filtradas en el directorio `filtered/`. Se usa `sample.names` como referencia.
+
+<!--pensar la longitud en la que se me quedan las lecturas:
+fw -> 250 aprox - corte -> 232 nt
+rv -> 250 apox - corte -> 164 nt
+
+deben solapar al menos 20 nt.
+Tamaño del amplicon 250 -- deben sumar tras el recorte al menos 270 para que haya solapamiento-->
+
+```{r namefilterfiles, warning = FALSE, cache = TRUE}
+# Generación de rutas para archivos filtrados
+filtFs <- file.path(".", "filtered", 
+                    paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(".", "filtered", 
+                    paste0(sample.names, "_R_filt.fastq.gz"))
+
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+```
+
+##### Consideraciones sobre el solapamiento: 
+Tras el recorte, las longitudes finales estimadas son de \~232 nucleótidos para las lecturas *forward* (originalmente \~250 nt) y \~164 nucleótidos para las *reverse* (también recortadas desde \~250 nt). Dado que el tamaño esperado del amplicón es de \~250 nt, la suma de las longitudes recortadas (396 nt)  por lo que se cumple holgadamente con el solapamiento mínimo requerido de 20 nt, lo que asegura una reconstrucción adecuada de las secuencias durante el ensamblaje (*merge*).
+
+
+El filtrado se realizó mediante la función *filterAndTrim* de dada2, utilizando los siguientes parámetros: `maxN=0` (ya que DADA2 no admite lecturas con bases ambiguas 'N'), `truncQ=2` (eliminando regiones con calidad decreciente), `rm.phix=TRUE` (para eliminar contaminación de fago PhiX) y `maxEE=c(2,5)` (permitiendo un máximo de 2,5 "errores esperados" por lectura, un criterio más robusto que el simple promedio de calidades). Además, se aplicó un recorte en los extremos 5': eliminando los primeros 13 nucleótidos en lecturas *forward* y los primeros 6 en *reverse*, junto con un truncado en las posiciones 246 (*forward*) y 170 (*reverse*), tal como se determinó previamente. Para optimizar el tiempo de procesamiento, se habilitó el parámetro *multithread*, permitiendo la ejecución en paralelo.
+
+<!-- comprobar si es 5´ o 3´ --> 
+
+```{r filtering, warning = FALSE, cache=TRUE, eval=FALSE}
+## Sin cudatp -- no quitar cebadores
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, 
+              maxN=0, maxEE=c(2,5), trimLeft=c(13,6), 
+              truncLen = c(246,170), 
+              truncQ=2, rm.phix=TRUE, compress=TRUE, 
+              multithread=TRUE) # On Windows set multithread=FALSE
+
+out<- cbind(out, perc.cons=round(out[, "reads.out"]/out[, "reads.in"]*100, 
+                                 digits=2))
+print("Total Reads")
+sum(out[,2])
+```
+
+
+<!--ver si son suficientes lecturas. en el de clase salieron 1.700.000 aprox con 16 muestras-->
+
+### Análisis de perfiles de calidad post-filtrado
+Tras completar el proceso de filtrado y recorte, se realizó una reevaluación sistemática de los perfiles de calidad mediante el mismo protocolo empleado inicialmente, aplicado tanto a las lecturas *forward* como *reverse*. Este paso de control de calidad permite verificar la eficacia de los parámetros de filtrado establecidos.
+
+```{r warning = FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+# Graficar calidad de las lecturas forward filtradas
+filtplot <- plotQualityProfile(filtFs[1:length(filtFs)], aggregate=TRUE) +
+    geom_hline(yintercept=c(15,25,35), 
+               color=c("red","blue","green"), 
+               linewidth=0.5)
+```
+
+```{r fowardfiltquality, warning = FALSE, message=FALSE, cache=TRUE}
+# Mostrar el gráfico
+print(filtplot)
+```
+
+
+```{r warning = FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+# # Graficar calidad de las lecturas forward filtradas
+filtRplot <- plotQualityProfile(filtRs[1:length(filtRs)], aggregate=TRUE) +
+    geom_hline(yintercept=c(15,25,35), 
+               color=c("red","blue","green"), 
+               linewidth=0.5)
+```
+
+```{r fowardfiltquality, warning = FALSE, message=FALSE, cache=TRUE}
+# Mostrar el gráfico
+print(filtRplot)
+```
+
+
+<!-- Poner una pequeña conclusión --> 
+
+## Procesamiento de secuencias: Desnoising y modelado de errores
+Una vez realizado el filtrado de lecturas, el siguiente paso consiste en identificar las secuencias biológicas verdaderas y corregir los errores introducidos durante la secuenciación. Para ello, dada2 emplea un algoritmo de *desreplicación y eliminación de ruido (denoising)*, que agrupa lecturas idénticas, distingue entre variantes reales y artefactos, y genera una **tabla de secuencias únicas** (ASV, *Amplicon Sequence Variants*). Esta tabla, que registra la abundancia de cada ASV en cada muestra, servirá como base para la posterior detección de quimeras.
+
+### Modelado de tasas de error
+Un componente crítico de este proceso es el modelado de tasas de error, ya que cada experimento tiene un perfil de errores distinto dependiendo de la plataforma de secuenciación, la región amplificada y la calidad de las muestras. Dada2 utiliza un modelo paramétrico que se ajusta iterativamente hasta converger en una estimación precisa. Para optimizar el entrenamiento del modelo, se calcula automáticamente el número de bases necesarias (usando aproximadamente la mitad del total de bases secuenciadas) y se seleccionan aleatoriamente subconjuntos de lecturas (`randomize=TRUE`), garantizando así robustez sin sobrecargar la memoria. Este enfoque equilibra eficiencia y precisión, especialmente útil en conjuntos de datos grandes.
+
+A continuación, se aplica este procedimiento tanto para las lecturas *forward* como *reverse*, generando modelos de error independientes para cada dirección. 
+
+<!--Los resultados se guardan en archivos .RData para su uso en pasos posteriores del análisis.-->
+
+```{r}
+# Inicializar el contador
+total_bases <- 0
+
+# Recorrer cada archivo en filtFs
+for (file in filtFs) {
+  seqs <- readFastq(file)
+  total_bases <- total_bases + sum(width(sread(seqs)))
+}
+
+# Calcular la mitad de las bases
+half_bases <- round(total_bases / 2)
+
+# Mostrar el resultado
+print(paste("Número total de bases:", total_bases))
+print(paste("Mitad de las bases (para entrenamiento, entero):", half_bases))
+```
+
+```{r errReverse, cache = TRUE, eval=FALSE}
+# Entrenar el modelo de errores
+errF <- learnErrors(filtFs, 
+                    multithread=TRUE, 
+                    nbases=half_bases, 
+                    randomize=TRUE)
+
+# Guardar el objeto errF en un archivo .RData
+save(errF, file = "errF_random.RData")
+```
+
+```{r}
+# Inicializar el contador
+total_bases <- 0
+
+# Recorrer cada archivo en filtRs
+for (file in filtRs) {
+  seqs <- readFastq(file)
+  total_bases <- total_bases + sum(width(sread(seqs)))
+}
+
+# Calcular la mitad de las bases
+half_bases <- round(total_bases / 2)
+
+# Mostrar el resultado
+print(paste("Número total de bases:", total_bases))
+print(paste("Mitad de las bases (para entrenamiento, entero):", half_bases))
+```
+
+```{r errReverse, cache = TRUE, eval=FALSE}
+# Entrenar el modelo de errores
+errR <- learnErrors(filtRs, 
+                    multithread=TRUE, 
+                    nbases=half_bases, 
+                    randomize=TRUE)
+
+# Guardar el objeto errF en un archivo .RData
+save(errR, file = "errR_random.RData")
+```
+
+### Visualización del modelo de errores
+La función `plotErrors()` permite graficar las tasas de error estimadas para cada posible transición de nucleótidos (A→C, A→G, etc.), mostrando tres elementos clave: el error observado (representado por puntos negros, que reflejan la frecuencia real de errores en los datos), el error estimado por dada2 (línea negra, que muestra el modelo ajustado tras la convergencia del algoritmo) y el error teórico según Phred (línea roja, basada en los valores de calidad esperados).
+
+```{r ploterrorsF, message= FALSE, warning= FALSE, cache = TRUE}
+plotErrors(errF, nominalQ=TRUE)
+```
+
+
+Este gráfico muestra el modelo de errores inferido por DADA2 para las lecturas forward, generado mediante la función `learnErrors()`. En él se representa cómo el algoritmo es capaz de diferenciar entre errores de secuenciación y verdaderas variantes biológicas.
+
+Se observa que las líneas rojas siguen de manera ajustada a los puntos negros, lo cual indica que el modelo se adapta adecuadamente a los datos reales de error. Este buen ajuste sugiere que DADA2 ha estimado correctamente las tasas de error para esta dirección de lectura. Como es esperable, las bases con una calidad Phred superior a 30 presentan tasas de error cercanas a 1e-4 o menores, mientras que las calidades inferiores a 20 muestran un aumento en la frecuencia de errores.
+
+Transiciones frecuentes en secuenciación Illumina, como A→G, C→T, G→A o T→C, están bien modeladas por el algoritmo. En contraste, sustituciones como A→A, C→C, etc., que representan bases que no han cambiado, muestran frecuencias cercanas a 1 y aparecen como una meseta en la parte superior del gráfico.
+
+En general, puede decirse que el modelo de error ha sido entrenado de forma correcta. Algunas sustituciones, como C→T o A→T, presentan una mayor dispersión en los datos observados, lo cual podría reflejar una mayor variabilidad en la ocurrencia de estos errores. Sin embargo, dicha variación se mantiene dentro de un rango razonable y esperado.
+
+Procedemos del mismo modo para las lecturas en *reverse*:
+
+```{r ploterrorsR, message= FALSE, warning= FALSE, cache = TRUE}
+plotErrors(errR, nominalQ=TRUE)
+```
+
+Este segundo gráfico representa el modelo de errores para las lecturas *reverse*.
+
+En general, podemos decir que el modelo de errores *reverse* es funcional y aceptable, aunque tiene un poco más de dispersión que el de *forward*, especialmente en las zonas de baja calidad. En mutaciones como C2T y G2A, la dispersión de los puntos sugiere que el ruido es más alto en las *reverse*, algo esperable en secuenciación Illumina, donde las lecturas *reverse* suelen tener peor calidad. Aun así, el modelo se ajusta razonablemente bien, y no hay indicios de que sea necesario repetir el paso de filtrado o corrección.
+
+Tabal comparativa modelo de error para lecturas foward y reverse:
+
+| Aspecto                     | Lecturas Forward                | Lecturas Reverse                |
+|-----------------------------|----------------------------------|---------------------------------|
+| Ajuste del modelo (línea roja) | Bastante bueno en general        | Ligeramente más disperso         |
+| Errores comunes (C↔T, A↔G)  | Bien modelados, caen con calidad | Más dispersión en C2T, G2A, A2T  |
+| Zonas de alta calidad       | Menos ruido en Q>30              | Más puntos desviados en Q>30     |
+| Paneles planos (X2X)        | Bien (p. ej., G2G, C2C)          | También OK                       |
+| Errores de transición (A2G, C2T) | Caen progresivamente con calidad | Algunos repuntes en calidad baja (~Q10-20) |
+| Ruido en calidad baja (<Q15) | Algo presente                    | Un poco más notorio              |
+
+### Inferencia de las muestras
+Una vez entrenado el modelo de error, aplicamos el algoritmo central de DADA2 para inferir las secuencias a partir de las lecturas filtradas. Este proceso se ejecuta de forma independiente para las lecturas en *forward* (`filtFs`), y en *reverse* (`filtRs`), ya que ambas presentaban diferencias en calidad. Para ello, utilizamos el modelo de error previamente aprendido (usando **errF** para las lecturas *forward* y **errR** para las *reverse*). El análisis se realizó en paralelo (`multithread=TRUE`) para optimizar el tiempo de procesamiento.
+
+```{r dadaF, warning=FALSE, cache=TRUE, eval=FALSE}
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+```
+
+La salida del comando indica que la muestra 1 contenía inicialmente 60,933 secuencias (*reads*). Tras el procesamiento con el algoritmo dada2, se identificaron 13,444 secuencias únicas.
+Este número total de reads refleja la profundidad de secuenciación de cada muestra (en este caso la muestra 1), mientras que el conteo de secuencias únicas representa la diversidad de variantes inferidas tras la corrección de errores (etapa implementada por DADA2). Cabe destacar que estos resultados aún no incluyen las lecturas en reverso (reverse reads) y por tanto, el número de secuencias únicas no tiene porqué corresponderse con las ASVs (*Amplicon Sequence Variants*).
+
+También se observar que algunas muestras (ej. muestras 25, 35, 42 y 46) presentan un número excepcionalmente alto de secuencias únicas. Esto puede atribuirse a una elevada diversidad biologica real, posible contaminación o presencia de ruido técnico. Otras muestras presentan un menor número de lectruas (ej. muestras 1 o 4) por lo que podrían tener menor poder de detección.
+
+```{r eval=FALSE}
+# Guardar el objeto errF en un archivo .RData
+save(dadaFs, file = "dadaFs_random.RData")
+```
+
+```{r eval=FALSE}
+#Cargar el objeto errF
+#load (file = "dadaFs_random.RData")
+```
+
+Procedemos del mismo modo para las lecturas en *reverse*:
+
+```{r dadaR, warning=FALSE, cache=TRUE, eval=False}
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
+
+La salida que nos devuelve es equivalente a la anterior, pero ahora para las lecturas *reverse*. 
+
+Podemos observar que cada muestra tiene el mismo número de lecturas que su versión *forward*. Esto es esperable, ya que en secuenciación *paired-end*, cada fragmento tiene una lectura *forward* y una *reverse*.
+
+Además, en casi todos los casos, el número de secuencias únicas es más alto en las lecturas *reverse* que en las *forward*. Por ejemplo, en la muestra 1, hemos obtenido 13,444 secuencias únicas en las *foward* y 15,779 en *reverse*. Esto podría deberser a una mayor tasa de error en las lecturas *reverse*, algo común en la secuenciación de Illumina.
+
+Si este es el caso, y las lecturas *reverse* tienen más errores o ruido, podrían dificultar la correcta unión (*merging*) con las lecturas *forward* en pasos posteriores, lo que reduciría la eficiencia del ensamblado.
+
+Muestras como la 25, 35, 42 y 46 presentan una diversidad aparente elevada (más de 50,000 secuencias únicas), lo cual podría indicar la presencia de errores o residuos que aún no han sido completamente filtrados.
+
+```{r eval=FALSE}
+# Guardar el objeto errF en un archivo .RData
+save(dadaRs, file = "dadaRs_random.RData")
+```
+
+```{r eval=FALSE}
+#Cargar el objeto errF
+#load (file = "dadaRs_random.RData")
+```
+
+A continuación, se inspeccionan los objetos generados tanto para las lecturas *foward* como las *reverse*.
+
+```{r dadaview, warning=FALSE, cache=TRUE}
+print("Forward Reads")
+dadaFs
+print("Reverse Reads")
+dadaRs
+```
+
+
+## Fusión de lecturas emparejadas
+En esta etapa, se procede a la fusión de las lecturas *forward* y *reverse* con el objetivo de reconstruir las secuencias originales completas sin ruido.
+
+La función `mergePairs()` alinea las lecturas *forward* sin ruido con el complemento inverso de las correspondientes lecturas *reverse* también depuradas, y construye las secuencias fusionadas (contigs). Por defecto, solo se generan secuencias fusionadas cuando las lecturas emparejadas presentan una superposición mínima de **20 bases** (lo cual hemos comprobado antes que en nuestro caso se cumple), y son completamente coincidentes en dicha región. 
+
+```{r merging, message=FALSE, warning=FALSE, cache=TRUE}
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+
+# Inspeccionar el data.frame de fusiones de la primera muestra
+head(mergers[[1]][,2:9])
+```
+
+El objeto `mergers` es una lista de `data.frames` de cada muestra. Cada uno de estos data.frame incluye, entre otras columnas `\$sequence` fusionada, su `\$abundance`, y los índices de las variantes de secuencia *forward* y *reverse* que se unieron. 
+
+Las lecturas emparejadas que no cumplen con los criterios de superposición exacta son descartadas por `mergePairs`, lo que contribuye a reducir aún más la generación de secuencias espurias en etapas posteriores del análisis.
+
+## Construcción de la tabla de secuencias
+Una vez fusionadas las lecturas, se procede a construir la tabla de variantes de secuencia de amplicón (*Amplicon Sequence Variants*, ASVs). Esta tabla representa una versión de mayor resolución en comparación con las tradicionales tablas de OTUs (Operational Taxonomic Units), al identificar secuencias únicas en lugar de agruparlas por similitud.
+
+```{r seqtable , warning = FALSE, cache = TRUE}
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+```
+
+```{r inspecttable, warning = FALSE, cache = TRUE}
+# Inspeccionar la distribución de longitudes de las secuencias
+table(nchar(getSequences(seqtab)))
+```
+
+El objeto `seqtab` es una matriz en la que las filas corresponden a las muestras (identificadas por su nombre) y las columnas a las variantes de secuencia (ASVs). En esta matriz se observan aproximadamente **4,000** ASVs. Sin embargo, no todas las secuencias fusionadas tienen longitudes compatibles con el amplicón esperado (región V4 del gen 16S rRNA).
+
+Se espera que las secuencias fusionadas tengan una longitud de aproximadamente 250 nucleótidos. Por lo tanto, se considera un rango amplio aceptable de entre **150 y 260 nucleótidos**.
+
+::: {.note}
+*Nota*: En este análisis, realizamos primero el filtrado por longitud antes de aplicar los filtros por abundancia y prevalencia. Esta decisión responde a limitaciones computacionales asociadas al entorno de trabajo (una máquina virtual). No obstante, lo más recomendable en condiciones normales es filtrar primero por abundancia y prevalencia, y luego por tamaño, para conservar la mayor cantidad de secuencias biológicamente relevantes posibles. No obstante, los resultados obtenidos no deberían ser muy discrepantes.
+:::
+
+```{r filteringseq, warning = FALSE, cache = TRUE}
+seqtab<- seqtab[,nchar(colnames(seqtab)) %in% 150:260]
+
+# Volver a inspeccionar la distribución de longitudes
+table(nchar(getSequences(seqtab)))               
+```
+
+## Eliminación de quimeras
+Aunque el algoritmo central de DADA2 corrige eficazmente errores de sustitución y de inserción/eliminación, aún pueden persistir secuencias *quiméricas*. Las quimeras son artefactos comunes en la amplificación por PCR y consisten en secuencias híbridas formadas por la combinación de segmentos de dos secuencias parentales distintas.
+
+Gracias a la alta resolución de las ASVs generadas tras la eliminación de ruido, la detección de quimeras se vuelve más precisa en comparación con enfoques basados en OTUs. En este paso, se identifican como quiméricas aquellas secuencias que pueden ser reconstruidas exactamente a partir de un segmento izquierdo y un segmento derecho de dos secuencias "parentales" más abundantes.
+
+```{r chimeras, warning=FALSE, cache=TRUE }
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", 
+                                    multithread=TRUE, verbose=TRUE)
+print("Removing chimera")
+dim(seqtab.nochim)
+print("Percentage against original sequences")
+sum(seqtab.nochim)/sum(seqtab)*100
+```
+
+En este caso, tras la eliminación de quimeras, se ha conservado aproximadamente un 92.51 % del total de secuencias, lo que indica que la proporción de quimeras era relativamente baja (alrededor del 7.49%). Esto sugiere una buena calidad general de los datos y un proceso de amplificación controlado.
+
+<!--cuando no quitas los adaptadores se pueden perder muchas secuencias al eliminar las quimeras. los adaptadores son iguales -- lo considera como quimeras y lo quita. comprobar que esto no pasa.-->
+
+## Seguimiento de lecturas a lo largo del proceso
+Como verificación final del desempeño del proceso, se realiza un seguimiento del número de lecturas que sobreviven a cada una de las etapas del pipeline de procesamiento. Esto permite evaluar la eficiencia de los distintos pasos (filtrado, desruido, fusión y eliminación de quimeras) y detectar posibles anomalías o pérdidas excesivas en muestras específicas.
+
+A continuación, se construye una tabla de seguimiento con el número de lecturas en cada paso:
+
+<!--
+
+```{r pipeline_summary, warning=FALSE, cache=TRUE}
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out[,1:2], sapply(dadaFs, getN), sapply(dadaRs, getN), 
+               sapply(mergers, getN), rowSums(seqtab.nochim))
+
+# If processing a single sample, remove the sapply calls: 
+#e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", 
+                     "denoisedR", "merged", "nonchim")
+
+rownames(track) <- sample.names
+track<- as.data.frame(track)
+track$conservedperc<-round(with(track, nonchim/input*100),2)
+print(track)
+```
+
+Si tenemos lagunas muestra que es diferente – nos centramos en esa muestra – vemos la calidad en específico de esa muestra. 
+Esto debe de hacer por triplicado y no por duplicados. 
+
+
+Cuando entreguemos el ejercicio – él está considerando solo una muestra – podemos considerar todas – es opcional. 
+Algunas de las funciones no nos las da. – quiere que innovemos algo –nos dice dónde podemos invar – lo compara para ver qué es lo que hemos metido. 
+-->
+
+```{r eval=FALSE}
+# Función para contar las lecturas únicas por muestra
+getN <- function(x) sum(getUniques(x))
+
+# Construcción de la tabla con el recuento de lecturas en cada etapa
+track <- cbind(
+  out[, 1:2],                        # Lecturas iniciales y filtradas 
+  sapply(dadaFs, getN),              # Lecturas desruidas (forward)
+  sapply(dadaRs, getN),              # Lecturas desruidas (reverse) 
+  sapply(mergers, getN),             # Lecturas fusionadas 
+  rowSums(seqtab.nochim)             # Lecturas no quiméricas
+)
+
+# Asignación de nombres de columnas y filas
+colnames(track) <- c("input", "filtered", "denoisedF", 
+                     "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+
+# Conversión a data.frame y cálculo de porcentajes
+track <- as.data.frame(track)
+
+# Calcular porcentaje conservado
+track$conserved_perc <- round(with(track, nonchim / input * 100), 2)
+
+# Cálculo de pérdidas relativas por etapa
+track$filter_loss_perc <- round(with
+                                (track, 
+                                     (input - filtered) / input * 100, 2)
+track$denoiseF_loss_perc <- round(with
+                                  (track, 
+                                    (filtered - denoisedF) / filtered * 100, 2)
+track$denoiseR_loss_perc <- round(with
+                                  (track, (
+                                    filtered - denoisedR) / filtered * 100, 2)
+track$merge_loss_perc <- round(with
+                               (track, 
+                                 (denoisedF - merged) / denoisedF * 100, 2))
+track$chimera_loss_perc <- round(with
+                                 (track, 
+                                   (merged - nonchim) / merged * 100, 2))
+
+# Visualización de la tabla completa
+print(track)
+```
+
+Esta tabla permite identificar rápidamente qué proporción de las lecturas originales ha sido retenida tras cada paso del análisis. La columna `conserved_perc` resume el porcentaje final de lecturas no quiméricas respecto a las lecturas iniciales, lo cual proporciona una métrica útil para evaluar la eficiencia general del pipeline.
+
+En este caso, la mayoría de las muestras muestran una conservación aceptable (en el rango 40-60%), y no se observa una pérdida drástica en ninguna etapa. 
+<!--No obstante, si alguna muestra presentara una desviación significativa respecto a las demás, sería recomendable revisar sus métricas de calidad en detalle.-->
+
+A continuación, se calcula un resumen estadístico de las pérdidas promedio por etapa:
+
+<!--quitar?? -->
+
+```{r statistics}
+# Resumen estadístico de los porcentajes de conservación
+summary_stats <- data.frame(
+  Paso = c("Input", "Filtered", "Denoised F", "Denoised R", 
+           "Merged", "Non-chimera"),
+  Media = c(NA, 
+            mean(track$filter_loss_perc),
+            mean(track$denoiseF_loss_perc),
+            mean(track$denoiseR_loss_perc),
+            mean(track$merge_loss_perc),
+            mean(track$chimera_loss_perc)),
+  SD = c(NA,
+         sd(track$filter_loss_perc),
+         sd(track$denoiseF_loss_perc),
+         sd(track$denoiseR_loss_perc),
+         sd(track$merge_loss_perc),
+         sd(track$chimera_loss_perc))
+)
+
+print(summary_stats)
+```
+
+
+
+<!-- meter cosas innovadoras
+
+```{r}
+# ANÁLISIS INNOVADOR DE TUBERÍA DE PROCESAMIENTO DE LECTURAS
+# ----------------------------------------------------------
+
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+# 1. Función mejorada para obtener estadísticas de lecturas
+get_read_stats <- function(obj) {
+  if (is.list(obj)) {
+    if (all(sapply(obj, function(x) inherits(x, "dada")))) {
+      return(sapply(obj, function(x) sum(getUniques(x))))
+    } else if (inherits(obj[[1]], "data.frame")) {
+      return(rowSums(obj))
+    }
+  } else if (inherits(obj, "matrix")) {
+    return(rowSums(obj))
+  }
+  return(obj)
+}
+
+# 2. Construcción del objeto track mejorado
+build_enhanced_track <- function(sample.names, out, dadaFs, dadaRs, mergers, seqtab.nochim) {
+  track <- data.frame(
+    Sample = sample.names,
+    Input = out[,1],
+    Filtered = out[,2],
+    DenoisedF = get_read_stats(dadaFs),
+    DenoisedR = get_read_stats(dadaRs),
+    Merged = get_read_stats(mergers),
+    Nonchimera = get_read_stats(seqtab.nochim),
+    stringsAsFactors = FALSE
+  ) %>%
+    mutate(
+      Total_loss = Input - Nonchimera,
+      Conserved_perc = round(Nonchimera/Input*100, 2),
+      Step1_loss = Input - Filtered,
+      Step2_loss = Filtered - pmin(DenoisedF, DenoisedR),
+      Step3_loss = pmin(DenoisedF, DenoisedR) - Merged,
+      Step4_loss = Merged - Nonchimera
+    )
+  
+  return(track)
+}
+
+# 3. Generar el objeto track con tus datos
+enhanced_track <- build_enhanced_track(sample.names, out, dadaFs, dadaRs, mergers, seqtab.nochim)
+
+# 4. Visualización interactiva de pérdidas por paso
+plot_read_loss <- function(track_df) {
+  loss_data <- track_df %>%
+    select(Sample, starts_with("Step")) %>%
+    tidyr::gather(Step, Loss, -Sample) %>%
+    mutate(Step = factor(Step, 
+                         levels = c("Step1_loss", "Step2_loss", "Step3_loss", "Step4_loss"),
+                         labels = c("Filtrado", "Desruido", "Merge", "Quimeras")))
+  
+  ggplot(loss_data, aes(x = Step, y = Loss, fill = Step, text = paste("Muestra:", Sample))) +
+    geom_boxplot(alpha = 0.7) +
+    geom_jitter(width = 0.2, alpha = 0.5) +
+    scale_y_log10() +
+    labs(title = "Pérdida de lecturas por paso del pipeline",
+         x = "Paso del procesamiento",
+         y = "Lecturas perdidas (log10)") +
+    theme_minimal()
+}
+
+interactive_plot <- ggplotly(plot_read_loss(enhanced_track), tooltip = "text")
+interactive_plot
+
+# 5. Análisis comparativo de eficiencia entre muestras
+efficiency_analysis <- enhanced_track %>%
+  group_by(Sample) %>%
+  summarise(
+    Total_Input = mean(Input),
+    Final_Output = mean(Nonchimera),
+    Global_Efficiency = round(mean(Conserved_perc), 2),
+    Filter_Eff = round(100 - mean(Step1_loss/Input*100), 2),
+    Denoise_Eff = round(100 - mean(Step2_loss/Filtered*100), 2),
+    Merge_Eff = round(100 - mean(Step3_loss/pmin(DenoisedF, DenoisedR)*100), 2),
+    Chimera_Eff = round(100 - mean(Step4_loss/Merged*100), 2)
+  ) %>%
+  arrange(desc(Global_Efficiency))
+
+# 6. Generar reporte automático de calidad
+generate_quality_report <- function(track_df) {
+  cat("REPORTE DE CALIDAD DEL PIPELINE\n")
+  cat("==============================\n\n")
+  
+  cat("Resumen estadístico:\n")
+  print(summary(track_df[,c("Input", "Conserved_perc")]))
+  
+  cat("\nMuestras con mejor rendimiento:\n")
+  print(head(arrange(track_df, desc(Conserved_perc)), 3))
+  
+  cat("\nMuestras con peor rendimiento:\n")
+  print(head(arrange(track_df, Conserved_perc), 3))
+  
+  cat("\nPérdida promedio por paso:\n")
+  loss_summary <- track_df %>%
+    summarise(
+      Filtrado = mean(Step1_loss),
+      Desruido = mean(Step2_loss),
+      Merge = mean(Step3_loss),
+      Quimeras = mean(Step4_loss)
+    )
+  print(loss_summary)
+}
+
+# Ejecutar el reporte
+generate_quality_report(enhanced_track)
+
+# 7. Exportar resultados (opcional)
+write.csv(enhanced_track, "read_tracking_analysis.csv", row.names = FALSE)
+saveRDS(enhanced_track, "pipeline_tracking_results.rds")
+```
+
+```{r}
+enhanced_track <- build_enhanced_track(sample.names, out, dadaFs, dadaRs, mergers, seqtab.nochim)
+```
+-->
+
+## Eliminación de ASVs de baja abundancia y baja prevalencia
+
+<!--***OJO!! esto habria que hacerlo despues de filtrar po tamaño. Primero filtrar por abundacia y prevalecia y después filtrar por tamaño.-->
+
+Aunque el algoritmo DADA2 es bastante conservador al estimar variantes de secuencia de amplicón (ASVs), aún pueden conservarse algunas secuencias de muy baja abundancia. Estas pueden representar artefactos, contaminación o fracciones muy poco representadas de la comunidad microbiana, introduciendo así ruido en los análisis de diversidad.
+
+Según lo reportado en la literatura, una práctica común es eliminar aquellas ASVs cuya abundancia total esté por debajo de un umbral determinado. Un criterio utilizado frecuentemente consiste en eliminar ASVs con una abundancia total inferior a **una por mil del número promedio de lecturas por muestra**. En este análisis, primero evaluamos la distribución de las lecturas finales por muestra:
+
+```{r track_distribution}
+summary(track$nonchim)
+```
+
+Utilizando el promedio (mean) de estas lecturas, calculamos el umbral de abundancia como:
+
+```{r track_distribution_mean}
+round(summary(track$nonchim)[['Mean']] / 1000, 0)
+```
+
+Además del umbral de abundancia, puede aplicarse un umbral de **prevalencia mínima**, es decir, el número mínimo de muestras en las que una ASV debe estar presente para ser considerada válida. En este caso, dado que estamos trabajando con triplicados biológicos, se estableció un umbral mínimo de **presencia en tres muestras**.
+
+A continuación, definimos una función personalizada que implementa estos criterios de filtrado:
+
+```{r abundance_filtering_function}
+subset_columns_by_sum_and_rows <- function(df_name, threshold, 
+                                           min_rows_with_value) {
+  df <- df_name
+  
+  col_sums <- colSums(df)
+  columns_to_keep <- col_sums >= threshold
+  
+  for (col_name in names(df)) {
+    if (!columns_to_keep[col_name]) next
+    if (sum(df[, col_name] > 0) < min_rows_with_value) {
+      columns_to_keep[col_name] <- FALSE
+    }
+  }
+  
+
+  df_new <- df[, columns_to_keep]
+  
+  # output the new dataframe
+  return(df_new)
+}
+```
+
+Aplicamos ahora la función a nuestra tabla de secuencias no quiméricas:
+
+```{r low_abundance_filtering}
+seqtab.nochimfiltered<- subset_columns_by_sum_and_rows(
+  seqtab.nochim, threshold=round(summary(track$nonchim)[['Mean']]/1000,0),
+                                                       min_rows_with_value=3)
+
+# Actualización del seguimiento
+track$nochimfiltered<-rowSums(seqtab.nochimfiltered)
+track$filteredperc<-round(with(track, nochimfiltered/nonchim*100),2)
+
+print(track)
+```
+
+Esta tabla actualizada (`track`) permite observar qué proporción de las lecturas no quiméricas se conservó después del filtrado por baja abundancia y baja prevalencia. La columna `filteredperc` muestra el porcentaje de retención relativo a las lecturas no quiméricas.
+
+<!--
+::: {.note}
+Nota metodológica importante: Aunque en este ejercicio hemos aplicado primero el filtrado por longitud y luego por abundancia/prevalencia para optimizar el uso de recursos en un entorno computacional limitado (como una máquina virtual), la recomendación general es realizar primero el filtrado por abundancia/prevalencia y posteriormente aplicar el filtrado por longitud. Esta secuencia asegura un procesamiento más riguroso de los datos y evita la exclusión prematura de secuencias potencialmente relevantes.
+:::
+-->
+
+<!--
+###################################
+ANALISIS COMPLEMENTARIOS DE PREVALENCIA
+####################################
+
+Cargar metadatos y agrupar réplicas
+```{r}
+library(phyloseq)
+library(microbiome)
+
+# Cargar metadatos (ajusta el path)
+metadata <- read.table("metadata", header = TRUE, sep = "\t", 
+                       row.names = "SampleID")
+
+# Crear grupos de réplicas (ej. por 'Day_Temp')
+metadata$group <- paste(metadata$Collection_Day, metadata$temperature, 
+                        sep = "_")
+
+# Verificar grupos
+table(metadata$group)
+```
+
+2. Análisis de prevalencia por grupo experimental
+Opción A: Usando microbiome (simple)
+
+```{r}
+# Calcular prevalencia por grupo
+prev_data <- prevalence(ps, detection = 1, sort = TRUE, by = "group")
+
+# Visualizar top ASVs prevalentes
+head(prev_data, 10)
+
+# Gráfico de prevalencia
+plot_prevalence(ps, detection = 1, color = "temperature") +
+  facet_wrap(~Collection_Day) +
+  theme_bw()
+```
+
+Opción B: Análisis avanzado con speedyseq
+
+```{r}
+library(speedyseq)
+
+# Agrupar réplicas y calcular prevalencia
+ps_grouped <- merge_samples(ps, "group", fun = mean)  # Promedio de abundancias
+
+# Resetear metadatos para los grupos
+sample_data(ps_grouped) <- metadata %>% 
+  distinct(group, .keep_all = TRUE) %>%
+  filter(group %in% sample_names(ps_grouped)) %>%
+  column_to_rownames("group")
+
+# Calcular prevalencia (porcentaje de réplicas donde aparece cada ASV)
+prev_table <- transform_sample_counts(ps, function(x) x > 0) %>% 
+  speedyseq::group_prevalence(group = "group")
+
+# Filtrar ASVs con alta prevalencia (ej. >50% de réplicas)
+high_prev_asvs <- prev_table %>% filter(prevalence > 50)
+```
+
+3. Visualización de resultados
+Heatmap de prevalencia
+
+```{r}
+library(ComplexHeatmap)
+
+# Matriz de prevalencia (ASVs x Grupos)
+prev_matrix <- as.matrix(high_prev_asvs[, -1])  # Excluir columna de ASV
+
+# Anotación de grupos
+ha <- HeatmapAnnotation(
+  Day = gsub("_.*", "", colnames(prev_matrix)),
+  Temp = gsub(".*_", "", colnames(prev_matrix))
+)
+
+# Dibujar heatmap
+Heatmap(prev_matrix,
+        name = "Prevalencia (%)",
+        top_annotation = ha,
+        show_row_names = FALSE,
+        col = viridis::viridis(100))
+```
+
+Prevalencia vs. Abundancia
+
+```{r}
+# Datos combinados
+plot_data <- data.frame(
+  ASV = rownames(tax_table(ps)),
+  Prevalence = rowMeans(otu_table(ps) > 0),
+  Abundance = rowMeans(otu_table(ps)),
+  Phylum = tax_table(ps)[, "Phylum"]
+)
+
+# Gráfico
+ggplot(plot_data, aes(x = Abundance, y = Prevalence, color = Phylum)) +
+  geom_point(alpha = 0.6) +
+  scale_x_log10() +
+  labs(title = "Relación Prevalencia-Abundancia") +
+  theme_minimal()
+```
+
+4. Interpretación biológica
+ASVs ubicuos: Aquellos con alta prevalencia en todos los grupos pueden ser "core microbiome".
+
+ASVs específicos: Prevalencia alta en solo ciertos grupos (ej. "cold_Day_11") sugieren adaptación a condiciones.
+
+Consistencia técnica: Réplicas con baja concordancia en prevalencia pueden indicar problemas técnicos.
+
+```{r}
+# Tabla de prevalencia
+write.csv(prev_table, "prevalencia_por_grupo.csv")
+
+# ASVs del core microbiome
+core_asvs <- prev_table %>% filter(prevalence > 75)  # >75% de réplicas
+write.csv(core_asvs, "core_microbiome_asvs.csv")
+```
+-->
+
+
+## Exportación de resultados para análisis posteriores
+Una vez completado el procesamiento de las lecturas (incluyendo la fusión, eliminación de quimeras y filtrado por abundancia/prevalencia), es posible exportar los datos procesados para su utilización en otros entornos de análisis.
+
+En esta sección exportamos tres elementos clave:
+
+- La **tabla de abundancia** de ASVs (formato compatible con QIIME2).
+- Las **secuencias representativas** en formato FASTA.
+- Las **estadísticas de seguimiento** del pipeline de procesamiento (número de lecturas conservadas en cada paso).
+
+Para facilitar la compatibilidad conotra herramientas como QIIME2 y mantener la coherencia con sus convenciones, codificamos los nombres de las características (ASVs) mediante su hash MD5.
+
+```{r export_resutls, warning=FALSE, cache = TRUE}
+# Codificación MD5 para nombres de ASVs
+seqtab.nochimmd5 <-seqtab.nochim
+sequences <- colnames(seqtab.nochimmd5)
+sequencesmd5<-md5(sequences)
+colnames(seqtab.nochimmd5)<-sequencesmd5
+
+# Exportar tabla de secuencias (no quiméricas, sin filtrado por abundancia)
+write.table(t(seqtab.nochimmd5), "seqtab-nochim.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+
+# Exportar secuencias representativas en formato FASTA
+uniquesToFasta(seqtab.nochim, fout='rep-seqs.fna', ids=sequencesmd5)
+
+# Exportar estadísticas del procesamiento
+write.table(t(track), "stats.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+```
+
+A continuación, realizamos los mismos pasos para la versión filtrada de la tabla (post-filtrado por baja abundancia y prevalencia). Esto nos permitirá comparar los resultados con y sin dicho filtrado, según las necesidades del análisis posterior.
+
+```{r export_resutls, warning=FALSE, cache = TRUE}
+# Codificación MD5 para ASVs filtradas
+seqtab.nochimfilteredmd5<-seqtab.nochimfiltered
+sequencesfiltered<-colnames(seqtab.nochimfilteredmd5)
+sequencesfilteredmd5<-md5(sequencesfiltered)
+colnames(seqtab.nochimfilteredmd5)<-sequencesfilteredmd5
+
+# Exportar tabla de secuencias filtradas
+write.table(t(seqtab.nochimfilteredmd5), "seqtab-nochimfiltered.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+
+# Exportar secuencias representativas filtradas
+uniquesToFasta(seqtab.nochimfiltered, fout='rep-seqs_filtered.fna', ids=sequencesfilteredmd5)
+```
+
+Con estos archivos (`seqtab-nochim.txt`, `rep-seqs.fna`, `stats.txt`, y sus versiones filtradas), se puede continuar el análisis tanto en RStudio (como haremos) o en otras herramientas como QIIME2 utilizando el plugin `feature-table` para importar las tablas y `feature-classifier` para realizar la asignación taxonómica.
+
+
+<!--
+```{r}
+# Al final de tu script
+save.image(file = "1-dada2_tg_SIN_CATADAPT.RData")
+```
+-->
