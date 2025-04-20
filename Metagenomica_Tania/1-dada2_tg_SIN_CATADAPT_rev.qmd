@@ -55,6 +55,7 @@ con tener lecturas de 150 pb solapan  -- necesitamos como minimo 20 nts de solpa
 
 ```{r loading_data}
 load("20250419.RData")
+load("1-dada2_tg_SIN_CATADAPT")
 ```
 
 ## Importación de librería necesarias para el proyecto
@@ -173,7 +174,7 @@ primerHits <- function(primer, fn) {
 
 Posteiormente, verificamos la presencia de todas las orientaciones de primers en todas los ficheros (muestras). 
 
-```{r eval=FALSE}
+```{r}
 # Crear una lista vacía para almacenar los resultados
 resultados_lista <- lapply(seq_along(fnFs), function(i) {
   data.frame(
@@ -198,7 +199,7 @@ Podemos observar que algunos de los archivos contienen secuencias correspondient
 
 Este análisis también puede repetirse utilizando el otro par de cebadores disponibles (primers originales).
 
-```{r eval=FALSE}
+```{r}
 # Crear una lista vacía para almacenar los resultados
 resultados_lista_ori <- lapply(seq_along(fnFs), function(i) {
   data.frame(
@@ -297,13 +298,12 @@ El filtrado se realizó mediante la función *filterAndTrim* de dada2, utilizand
 
 <!-- comprobar si es 5´ o 3´ --> 
 
-```{r filtering, warning = FALSE, cache=TRUE, eval=FALSE}
-## Sin cudatp -- no quitar cebadores
+```{r filtering, warning = FALSE, cache=TRUE}
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, 
               maxN=0, maxEE=c(2,5), trimLeft=c(13,6), 
               truncLen = c(246,170), 
               truncQ=2, rm.phix=TRUE, compress=TRUE, 
-              multithread=TRUE) # On Windows set multithread=FALSE
+              multithread=TRUE)
 
 out<- cbind(out, perc.cons=round(out[, "reads.out"]/out[, "reads.in"]*100, 
                                  digits=2))
@@ -317,7 +317,7 @@ sum(out[,2])
 ### Análisis de perfiles de calidad post-filtrado
 Tras completar el proceso de filtrado y recorte, se realizó una reevaluación sistemática de los perfiles de calidad mediante el mismo protocolo empleado inicialmente, aplicado tanto a las lecturas *forward* como *reverse*. Este paso de control de calidad permite verificar la eficacia de los parámetros de filtrado establecidos.
 
-```{r warning = FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+```{r warning = FALSE, message=FALSE, cache=TRUE}
 # Graficar calidad de las lecturas forward filtradas
 filtplot <- plotQualityProfile(filtFs[1:length(filtFs)], aggregate=TRUE) +
     geom_hline(yintercept=c(15,25,35), 
@@ -331,7 +331,7 @@ print(filtplot)
 ```
 
 
-```{r warning = FALSE, message=FALSE, cache=TRUE, eval=FALSE}
+```{r warning = FALSE, message=FALSE, cache=TRUE}
 # # Graficar calidad de las lecturas forward filtradas
 filtRplot <- plotQualityProfile(filtRs[1:length(filtRs)], aggregate=TRUE) +
     geom_hline(yintercept=c(15,25,35), 
@@ -469,9 +469,9 @@ También se observar que algunas muestras (ej. muestras 25, 35, 42 y 46) present
 save(dadaFs, file = "dadaFs_random.RData")
 ```
 
-```{r eval=FALSE}
+```{r}
 #Cargar el objeto errF
-#load (file = "dadaFs_random.RData")
+load (file = "dadaFs_random.RData")
 ```
 
 Procedemos del mismo modo para las lecturas en *reverse*:
@@ -495,9 +495,9 @@ Muestras como la 25, 35, 42 y 46 presentan una diversidad aparente elevada (más
 save(dadaRs, file = "dadaRs_random.RData")
 ```
 
-```{r eval=FALSE}
+```{r}
 #Cargar el objeto errF
-#load (file = "dadaRs_random.RData")
+load (file = "dadaRs_random.RData")
 ```
 
 A continuación, se inspeccionan los objetos generados tanto para las lecturas *foward* como las *reverse*.
@@ -603,7 +603,7 @@ Cuando entreguemos el ejercicio – él está considerando solo una muestra – 
 Algunas de las funciones no nos las da. – quiere que innovemos algo –nos dice dónde podemos invar – lo compara para ver qué es lo que hemos metido. 
 -->
 
-```{r eval=FALSE}
+```{r}
 # Función para contar las lecturas únicas por muestra
 getN <- function(x) sum(getUniques(x))
 
